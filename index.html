@@ -26,6 +26,14 @@
     --danger:#a6453a;
     --radius:14px;
   }
+  body.theme-clair{
+    --bg:#f4efe6;
+    --surface:#ffffff;
+    --surface-2:#ece4d6;
+    --border:#ddd2bd;
+    --text:#2a2621;
+    --text-dim:#7d7264;
+  }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;height:100%;}
   body{
@@ -253,6 +261,7 @@
   </section>
 
   <button class="settings-link" onclick="ouvrirModalReglages()">Temps de repos par défaut</button>
+  <button class="settings-link" onclick="ouvrirModalApparence()">Apparence (clair / sombre)</button>
   <button class="settings-link" onclick="ouvrirModalSync()">Synchronisation GitHub</button>
   <div class="sync-status" id="syncStatus"></div>
 </main>
@@ -295,7 +304,7 @@
     <input type="file" id="exPhoto" accept="image/*">
     <div class="sheet-actions">
       <button class="ghost" onclick="fermerModal('modalExercice')">Annuler</button>
-      <button class="primary" onclick="creerExercice()">Créer</button>
+      <button class="primary" id="btnCreerExercice" onclick="creerExercice()">Créer</button>
     </div>
   </div>
 </div>
@@ -325,6 +334,21 @@
     <div class="sheet-actions">
       <button class="ghost" onclick="fermerModal('modalReglages')">Annuler</button>
       <button class="primary" onclick="sauverReglages()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL APPARENCE -->
+<div class="overlay" id="modalApparence">
+  <div class="sheet">
+    <h2>Apparence</h2>
+    <label class="field-label">Thème</label>
+    <div class="sheet-actions" style="margin-bottom:6px;">
+      <button class="ghost" id="btnThemeSombre" onclick="appliquerTheme('sombre')">Sombre</button>
+      <button class="ghost" id="btnThemeClair" onclick="appliquerTheme('clair')">Clair</button>
+    </div>
+    <div class="sheet-actions">
+      <button class="ghost" style="width:100%;" onclick="fermerModal('modalApparence')">Fermer</button>
     </div>
   </div>
 </div>
@@ -440,8 +464,23 @@ function renderBibliotheque(){
         📷
         <input type="file" accept="image/*" style="display:none;" onchange="ajouterPhoto('${e.id}', this)">
       </label>
+      <button class="icon-btn" title="Supprimer" onclick="supprimerExercice('${e.id}')">🗑</button>
     </div>
   `).join('');
+}
+
+function supprimerExercice(exId){
+  const ex = etat.exercices.find(e=>e.id===exId);
+  if(!ex) return;
+  const utiliseDans = etat.seances.filter(s=>s.exercices.some(x=>x.exerciceId===exId));
+  let message = `Supprimer "${ex.nom}" ?`;
+  if(utiliseDans.length>0){
+    message += `\n\nAttention : cet exercice est utilisé dans ${utiliseDans.length} séance(s) (${utiliseDans.map(s=>s.nom).join(', ')}). Il sera retiré de la bibliothèque mais restera référencé dans ton historique passé.`;
+  }
+  if(!confirm(message)) return;
+  etat.exercices = etat.exercices.filter(e=>e.id!==exId);
+  sauver();
+  renderBibliotheque();
 }
 
 function ajouterPhoto(exId, input){
@@ -460,21 +499,29 @@ function ouvrirModalExercice(){
   document.getElementById('exPhoto').value='';
   ouvrirModal('modalExercice');
 }
+let creationExerciceEnCours = false;
 function creerExercice(){
+  if(creationExerciceEnCours) return;
   const nom = document.getElementById('exNom').value.trim();
   const groupe = document.getElementById('exGroupe').value;
   const fichier = document.getElementById('exPhoto').files[0];
   if(!nom){ alert('Donne un nom à l\'exercice.'); return; }
+  creationExerciceEnCours = true;
+  const btn = document.getElementById('btnCreerExercice');
+  if(btn){ btn.disabled = true; btn.textContent = 'Création...'; }
   const nouvel = {id:'ex_'+Date.now(), nom, groupe, image:null, source:'perso'};
   const finaliser = ()=>{
     etat.exercices.push(nouvel);
     sauver();
+    creationExerciceEnCours = false;
+    if(btn){ btn.disabled = false; btn.textContent = 'Créer'; }
     fermerModal('modalExercice');
     renderBibliotheque();
   };
   if(fichier){
     const lecteur = new FileReader();
     lecteur.onload = e=>{ nouvel.image = e.target.result; finaliser(); };
+    lecteur.onerror = ()=>{ creationExerciceEnCours=false; if(btn){btn.disabled=false; btn.textContent='Créer';} alert('Erreur de lecture de la photo.'); };
     lecteur.readAsDataURL(fichier);
   } else finaliser();
 }
@@ -689,6 +736,22 @@ function majAnneauRepos(){
 function arreterChronos(){
   clearInterval(chronoSeanceInterval);
   clearInterval(chronoRepoInterval);
+}
+
+/* ---------- Thème ---------- */
+const THEME_KEY = 'fonteTheme';
+function chargerTheme(){ return localStorage.getItem(THEME_KEY) || 'sombre'; }
+function appliquerTheme(mode){
+  document.body.classList.toggle('theme-clair', mode==='clair');
+  localStorage.setItem(THEME_KEY, mode);
+  document.getElementById('btnThemeSombre').style.borderColor = mode==='sombre' ? 'var(--accent)' : 'var(--border)';
+  document.getElementById('btnThemeClair').style.borderColor = mode==='clair' ? 'var(--accent)' : 'var(--border)';
+}
+function ouvrirModalApparence(){
+  ouvrirModal('modalApparence');
+  const mode = chargerTheme();
+  document.getElementById('btnThemeSombre').style.borderColor = mode==='sombre' ? 'var(--accent)' : 'var(--border)';
+  document.getElementById('btnThemeClair').style.borderColor = mode==='clair' ? 'var(--accent)' : 'var(--border)';
 }
 
 /* ---------- Réglages ---------- */
@@ -968,6 +1031,7 @@ async function tirerDepuisGitHub(){
 }
 
 /* ---------- Démarrage ---------- */
+document.body.classList.toggle('theme-clair', chargerTheme()==='clair');
 renderBibliotheque();
 </script>
 </body>
