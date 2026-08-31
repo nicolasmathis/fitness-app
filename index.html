@@ -422,7 +422,40 @@ let etat = chargerEtat();
 let filtreGroupe = 'tous';
 
 function sauver(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(etat));
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(etat));
+    return true;
+  }catch(e){
+    console.log('Erreur de sauvegarde :', e);
+    return false;
+  }
+}
+
+/* ---------- Traitement des photos ---------- */
+function traiterPhoto(fichier, callback){
+  const lecteur = new FileReader();
+  lecteur.onload = e=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const maxDim = 400;
+      let w = img.width, h = img.height;
+      if(w > h){ if(w > maxDim){ h = Math.round(h * maxDim/w); w = maxDim; } }
+      else { if(h > maxDim){ w = Math.round(w * maxDim/h); h = maxDim; } }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      try{
+        callback(canvas.toDataURL('image/jpeg', 0.75));
+      }catch(err){
+        callback(null);
+      }
+    };
+    img.onerror = ()=> callback(null);
+    img.src = e.target.result;
+  };
+  lecteur.onerror = ()=> callback(null);
+  lecteur.readAsDataURL(fichier);
 }
 
 /* ---------- Navigation ---------- */
@@ -486,12 +519,20 @@ function supprimerExercice(exId){
 function ajouterPhoto(exId, input){
   const fichier = input.files[0];
   if(!fichier) return;
-  const lecteur = new FileReader();
-  lecteur.onload = function(e){
+  traiterPhoto(fichier, (dataUrl)=>{
+    if(!dataUrl){ alert('Erreur de lecture de la photo.'); return; }
     const ex = etat.exercices.find(x=>x.id===exId);
-    if(ex){ ex.image = e.target.result; sauver(); renderBibliotheque(); }
-  };
-  lecteur.readAsDataURL(fichier);
+    if(!ex) return;
+    const ancienneImage = ex.image;
+    ex.image = dataUrl;
+    const ok = sauver();
+    if(!ok){
+      ex.image = ancienneImage;
+      alert('Impossible d\'enregistrer : la photo est trop volumineuse pour le stockage disponible.');
+      return;
+    }
+    renderBibliotheque();
+  });
 }
 
 function ouvrirModalExercice(){
@@ -512,17 +553,28 @@ function creerExercice(){
   const nouvel = {id:'ex_'+Date.now(), nom, groupe, image:null, source:'perso'};
   const finaliser = ()=>{
     etat.exercices.push(nouvel);
-    sauver();
+    const ok = sauver();
     creationExerciceEnCours = false;
     if(btn){ btn.disabled = false; btn.textContent = 'Créer'; }
+    if(!ok){
+      etat.exercices.pop();
+      alert('Impossible d\'enregistrer : la photo est trop volumineuse pour le stockage disponible. Essaie avec une image plus légère.');
+      return;
+    }
     fermerModal('modalExercice');
     renderBibliotheque();
   };
   if(fichier){
-    const lecteur = new FileReader();
-    lecteur.onload = e=>{ nouvel.image = e.target.result; finaliser(); };
-    lecteur.onerror = ()=>{ creationExerciceEnCours=false; if(btn){btn.disabled=false; btn.textContent='Créer';} alert('Erreur de lecture de la photo.'); };
-    lecteur.readAsDataURL(fichier);
+    traiterPhoto(fichier, (dataUrl)=>{
+      if(!dataUrl){
+        creationExerciceEnCours = false;
+        if(btn){ btn.disabled = false; btn.textContent = 'Créer'; }
+        alert('Erreur de lecture de la photo. Réessaie ou continue sans photo.');
+        return;
+      }
+      nouvel.image = dataUrl;
+      finaliser();
+    });
   } else finaliser();
 }
 
