@@ -247,7 +247,7 @@
   <!-- VUE SEANCES -->
   <section id="view-seances" class="view">
     <div id="listeSeances"></div>
-    <div class="fab-row"><button class="primary" onclick="ouvrirModalSeance()">+ Séance</button></div>
+    <div class="fab-row"><button class="primary" onclick="ouvrirModalSeance()">+ Programme</button></div>
   </section>
 
   <!-- VUE EN COURS -->
@@ -273,11 +273,11 @@
   </button>
   <button data-view="seances" onclick="changerVue('seances')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5a2 2 0 0 1 2-2h8.5L20 7.5V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 3v5h5"/></svg>
-    Séances
+    Programmes
   </button>
   <button data-view="encours" onclick="changerVue('encours')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-    En cours
+    Séance
   </button>
   <button data-view="evolution" onclick="changerVue('evolution')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
@@ -309,17 +309,30 @@
   </div>
 </div>
 
-<!-- MODAL SEANCE -->
-<div class="overlay" id="modalSeance">
+<!-- MODAL SEANCE ETAPE 1 : selection -->
+<div class="overlay" id="modalSeanceEtape1">
   <div class="sheet">
-    <h2>Nouvelle séance</h2>
-    <label class="field-label">Nom de la séance</label>
+    <h2 id="titreEtape1">Nouveau programme</h2>
+    <label class="field-label">Nom du programme</label>
     <input type="text" id="seNom" placeholder="Ex : Push">
     <label class="field-label">Exercices inclus</label>
+    <div class="group-filter" id="seGroupFilter"></div>
     <div id="seExosCheck" style="max-height:280px;overflow-y:auto;margin-bottom:6px;"></div>
     <div class="sheet-actions">
-      <button class="ghost" onclick="fermerModal('modalSeance')">Annuler</button>
-      <button class="primary" onclick="creerSeance()">Créer</button>
+      <button class="ghost" onclick="fermerModal('modalSeanceEtape1')">Annuler</button>
+      <button class="primary" onclick="passerEtapeConfig()">Suivant</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SEANCE ETAPE 2 : configuration -->
+<div class="overlay" id="modalSeanceEtape2">
+  <div class="sheet">
+    <h2>Configurer le programme</h2>
+    <div id="seConfigList" style="max-height:340px;overflow-y:auto;margin-bottom:6px;"></div>
+    <div class="sheet-actions">
+      <button class="ghost" onclick="retourEtapeSelection()">Précédent</button>
+      <button class="primary" id="btnFinaliserSeance" onclick="finaliserSeance()">Créer</button>
     </div>
   </div>
 </div>
@@ -578,11 +591,11 @@ function creerExercice(){
   } else finaliser();
 }
 
-/* ---------- Vue Séances ---------- */
+/* ---------- Vue Séances (Programmes) ---------- */
 function renderSeances(){
   const c = document.getElementById('listeSeances');
   if(etat.seances.length===0){
-    c.innerHTML = `<div class="empty-state"><div class="plate-lg"></div>Crée ta première séance à partir de ta bibliothèque.</div>`;
+    c.innerHTML = `<div class="empty-state"><div class="plate-lg"></div>Crée ton premier programme à partir de ta bibliothèque.</div>`;
     return;
   }
   c.innerHTML = etat.seances.map(s=>`
@@ -592,32 +605,143 @@ function renderSeances(){
           <h3>${s.nom}</h3>
           <p class="muted">${s.exercices.length} exercice${s.exercices.length>1?'s':''}</p>
         </div>
-        <button class="primary" onclick="demarrerSeance('${s.id}')">Démarrer</button>
+        <div style="display:flex;gap:8px;">
+          <button class="icon-btn" title="Modifier" onclick="ouvrirModalSeance('${s.id}')">✎</button>
+          <button class="icon-btn" title="Supprimer" onclick="supprimerSeance('${s.id}')">🗑</button>
+        </div>
       </div>
+      <button class="primary" style="width:100%;margin-top:10px;" onclick="demarrerSeance('${s.id}')">Démarrer</button>
     </div>
   `).join('');
 }
 
-function ouvrirModalSeance(){
-  document.getElementById('seNom').value='';
-  const c = document.getElementById('seExosCheck');
-  c.innerHTML = etat.exercices.map(e=>`
-    <label style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border);">
-      <input type="checkbox" value="${e.id}" style="width:auto;margin:0;">
-      <span>${e.nom} <span class="muted">· ${GROUPES_LABEL[e.groupe]}</span></span>
-    </label>
-  `).join('');
-  ouvrirModal('modalSeance');
-}
-function creerSeance(){
-  const nom = document.getElementById('seNom').value.trim();
-  const cases = document.querySelectorAll('#seExosCheck input[type=checkbox]:checked');
-  if(!nom){ alert('Donne un nom à la séance.'); return; }
-  if(cases.length===0){ alert('Sélectionne au moins un exercice.'); return; }
-  const exercices = Array.from(cases).map(c=>({exerciceId:c.value, seriesPrevues:4, repsCibles:10}));
-  etat.seances.push({id:'se_'+Date.now(), nom, exercices});
+function supprimerSeance(id){
+  const s = etat.seances.find(x=>x.id===id);
+  if(!s) return;
+  if(!confirm(`Supprimer le programme "${s.nom}" ?`)) return;
+  etat.seances = etat.seances.filter(x=>x.id!==id);
   sauver();
-  fermerModal('modalSeance');
+  renderSeances();
+}
+
+/* Construction / édition d'un programme en 2 étapes */
+let seanceConstruction = {editId:null, nom:'', selection:{}};
+let filtreGroupeModalSeance = 'tous';
+
+function ouvrirModalSeance(editId=null){
+  seanceConstruction = {editId, nom:'', selection:{}};
+  if(editId){
+    const s = etat.seances.find(x=>x.id===editId);
+    if(s){
+      seanceConstruction.nom = s.nom;
+      s.exercices.forEach(ex=>{
+        seanceConstruction.selection[ex.exerciceId] = {
+          inclus:true,
+          series: ex.seriesPrevues || 4,
+          poids: (ex.poidsCible!=null) ? ex.poidsCible : ''
+        };
+      });
+    }
+  }
+  document.getElementById('titreEtape1').textContent = editId ? 'Modifier le programme' : 'Nouveau programme';
+  document.getElementById('seNom').value = seanceConstruction.nom;
+  filtreGroupeModalSeance = 'tous';
+  renderSeGroupFilter();
+  renderSeExosCheck();
+  ouvrirModal('modalSeanceEtape1');
+}
+
+function setFiltreModalSeance(g){ filtreGroupeModalSeance = g; renderSeGroupFilter(); renderSeExosCheck(); }
+
+function renderSeGroupFilter(){
+  const c = document.getElementById('seGroupFilter');
+  const groupes = ['tous',...GROUPES];
+  c.innerHTML = groupes.map(g=>`<button class="${filtreGroupeModalSeance===g?'active':''}" onclick="setFiltreModalSeance('${g}')">${g==='tous'?'Tous':GROUPES_LABEL[g]}</button>`).join('');
+}
+
+function renderSeExosCheck(){
+  const c = document.getElementById('seExosCheck');
+  let liste = etat.exercices;
+  if(filtreGroupeModalSeance!=='tous') liste = liste.filter(e=>e.groupe===filtreGroupeModalSeance);
+  if(liste.length===0){ c.innerHTML = '<p class="muted">Aucun exercice dans ce groupe.</p>'; return; }
+  c.innerHTML = liste.map(e=>{
+    const coche = !!(seanceConstruction.selection[e.id] && seanceConstruction.selection[e.id].inclus);
+    return `
+    <label style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border);">
+      <input type="checkbox" ${coche?'checked':''} onchange="toggleSelectionExercice('${e.id}', this.checked)" style="width:auto;margin:0;">
+      <span>${e.nom} <span class="muted">· ${GROUPES_LABEL[e.groupe]}</span></span>
+    </label>`;
+  }).join('');
+}
+
+function toggleSelectionExercice(exId, coche){
+  if(!seanceConstruction.selection[exId]) seanceConstruction.selection[exId] = {inclus:false, series:4, poids:''};
+  seanceConstruction.selection[exId].inclus = coche;
+}
+
+function passerEtapeConfig(){
+  const nom = document.getElementById('seNom').value.trim();
+  if(!nom){ alert('Donne un nom au programme.'); return; }
+  const inclus = Object.keys(seanceConstruction.selection).filter(id=>seanceConstruction.selection[id].inclus);
+  if(inclus.length===0){ alert('Sélectionne au moins un exercice.'); return; }
+  seanceConstruction.nom = nom;
+  renderSeConfigList();
+  fermerModal('modalSeanceEtape1');
+  document.getElementById('btnFinaliserSeance').textContent = seanceConstruction.editId ? 'Enregistrer' : 'Créer';
+  ouvrirModal('modalSeanceEtape2');
+}
+
+function retourEtapeSelection(){
+  fermerModal('modalSeanceEtape2');
+  renderSeExosCheck();
+  ouvrirModal('modalSeanceEtape1');
+}
+
+function renderSeConfigList(){
+  const c = document.getElementById('seConfigList');
+  const ids = Object.keys(seanceConstruction.selection).filter(id=>seanceConstruction.selection[id].inclus);
+  c.innerHTML = ids.map(exId=>{
+    const ex = etat.exercices.find(e=>e.id===exId);
+    const sel = seanceConstruction.selection[exId];
+    if(!ex) return '';
+    return `
+    <div class="card" style="padding:12px;">
+      <div class="row" style="margin-bottom:8px;"><h3 style="font-size:14px;margin:0;">${ex.nom}</h3><span class="chip">${GROUPES_LABEL[ex.groupe]}</span></div>
+      <div style="display:flex;gap:10px;">
+        <div style="flex:1;"><label class="field-label">Séries</label><input type="number" min="1" value="${sel.series}" onchange="majConfigSeance('${exId}','series',this.value)"></div>
+        <div style="flex:1;"><label class="field-label">Poids cible (kg)</label><input type="number" min="0" step="0.5" value="${sel.poids}" onchange="majConfigSeance('${exId}','poids',this.value)"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function majConfigSeance(exId, champ, valeur){
+  if(!seanceConstruction.selection[exId]) return;
+  seanceConstruction.selection[exId][champ] = valeur;
+}
+
+function finaliserSeance(){
+  const ids = Object.keys(seanceConstruction.selection).filter(id=>seanceConstruction.selection[id].inclus);
+  if(ids.length===0){ alert('Sélectionne au moins un exercice.'); return; }
+  const exercices = ids.map(exId=>{
+    const sel = seanceConstruction.selection[exId];
+    const series = parseInt(sel.series,10);
+    const poids = parseFloat(sel.poids);
+    return {
+      exerciceId: exId,
+      seriesPrevues: (!isNaN(series) && series>0) ? series : 4,
+      repsCibles: 10,
+      poidsCible: (!isNaN(poids) && poids>=0) ? poids : null
+    };
+  });
+  if(seanceConstruction.editId){
+    const s = etat.seances.find(x=>x.id===seanceConstruction.editId);
+    if(s){ s.nom = seanceConstruction.nom; s.exercices = exercices; }
+  } else {
+    etat.seances.push({id:'se_'+Date.now(), nom: seanceConstruction.nom, exercices});
+  }
+  sauver();
+  fermerModal('modalSeanceEtape2');
   renderSeances();
 }
 
@@ -634,10 +758,12 @@ function demarrerSeance(seanceId){
     seanceId,
     nom: modele.nom,
     debutTs: Date.now(),
+    tempsEcouleSec: 0,
+    derniereReprise: null,
     series: modele.exercices.flatMap(ex=>{
       const arr = [];
       for(let i=1;i<=ex.seriesPrevues;i++){
-        arr.push({exerciceId:ex.exerciceId, numero:i, poids:'', reps: ex.repsCibles, fait:false});
+        arr.push({exerciceId:ex.exerciceId, numero:i, poids:(ex.poidsCible!=null?ex.poidsCible:''), reps: ex.repsCibles, fait:false});
       }
       return arr;
     })
@@ -645,6 +771,25 @@ function demarrerSeance(seanceId){
   sauver();
   changerVue('encours');
   activerWakeLock();
+}
+
+function toggleChronoSeance(){
+  const s = etat.seanceActive;
+  if(!s) return;
+  if(s.derniereReprise){
+    s.tempsEcouleSec += (Date.now()-s.derniereReprise)/1000;
+    s.derniereReprise = null;
+  } else {
+    s.derniereReprise = Date.now();
+  }
+  sauver();
+  renderEnCours();
+}
+
+function tempsSeanceEcouleSec(){
+  const s = etat.seanceActive;
+  if(!s) return 0;
+  return s.tempsEcouleSec + (s.derniereReprise ? (Date.now()-s.derniereReprise)/1000 : 0);
 }
 
 function terminerSeance(){
@@ -690,6 +835,7 @@ function renderEnCours(){
       <div class="duree">
         Durée séance
         <span class="num" id="dureeSeance">00:00</span>
+        <button class="ghost" id="btnToggleChrono" style="margin-top:6px;padding:6px 14px;font-size:12px;" onclick="toggleChronoSeance()">${s.derniereReprise ? '⏸ Pause' : '▶ Démarrer'}</button>
       </div>
       <div class="plate-ring">
         <svg width="88" height="88">
@@ -749,11 +895,11 @@ function demarrerChronoSeance(){
   clearInterval(chronoSeanceInterval);
   chronoSeanceInterval = setInterval(()=>{
     if(!etat.seanceActive) return;
-    const sec = Math.floor((Date.now()-etat.seanceActive.debutTs)/1000);
+    const sec = Math.floor(tempsSeanceEcouleSec());
     const m = String(Math.floor(sec/60)).padStart(2,'0');
-    const s = String(sec%60).padStart(2,'0');
+    const s2 = String(sec%60).padStart(2,'0');
     const el = document.getElementById('dureeSeance');
-    if(el) el.textContent = `${m}:${s}`;
+    if(el) el.textContent = `${m}:${s2}`;
   },1000);
 }
 
