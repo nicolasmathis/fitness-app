@@ -399,6 +399,7 @@
       <button class="ghost" onclick="pousserVersGitHub()">Envoyer ↑</button>
       <button class="ghost" onclick="tirerDepuisGitHub()">Récupérer ↓</button>
     </div>
+    <div class="sync-status" id="syncStatusModal" style="margin-top:12px;"></div>
   </div>
 </div>
 
@@ -1297,6 +1298,12 @@ function ouvrirModalSync(){
   document.getElementById('syncToken').value = cfg.token;
   ouvrirModal('modalSync');
 }
+function majStatutSync(texte){
+  const a = document.getElementById('syncStatusModal');
+  const b = document.getElementById('syncStatus');
+  if(a) a.textContent = texte;
+  if(b) b.textContent = texte;
+}
 function sauverConfigSync(){
   const cfg = {
     owner: document.getElementById('syncOwner').value.trim(),
@@ -1305,15 +1312,13 @@ function sauverConfigSync(){
     token: document.getElementById('syncToken').value.trim()
   };
   localStorage.setItem(SYNC_KEY, JSON.stringify(cfg));
-  document.getElementById('syncStatus').textContent = 'Configuration enregistrée.';
-  fermerModal('modalSync');
+  majStatutSync('Configuration enregistrée.');
 }
 
 async function pousserVersGitHub(){
   const cfg = chargerConfigSync();
-  if(!cfg.owner || !cfg.repo || !cfg.token){ alert('Configure d\'abord owner, repo et token.'); return; }
-  const statusEl = document.getElementById('syncStatus');
-  statusEl.textContent = 'Envoi en cours...';
+  if(!cfg.owner || !cfg.repo || !cfg.token){ majStatutSync('Configure d\'abord owner, repo et token, puis Enregistrer.'); return; }
+  majStatutSync('Envoi en cours...');
   try{
     const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
     let sha = null;
@@ -1325,30 +1330,35 @@ async function pousserVersGitHub(){
       headers:{Authorization:`token ${cfg.token}`, 'Content-Type':'application/json'},
       body: JSON.stringify({message:'Sync GYM '+new Date().toISOString(), content:contenu, sha})
     });
-    if(!resp.ok) throw new Error('Échec envoi ('+resp.status+')');
-    statusEl.textContent = 'Envoyé sur GitHub avec succès.';
+    if(!resp.ok){
+      const detail = await resp.text().catch(()=> '');
+      throw new Error('Échec envoi ('+resp.status+')'+(detail?' — '+detail.slice(0,120):''));
+    }
+    majStatutSync('Envoyé sur GitHub avec succès.');
   }catch(e){
-    statusEl.textContent = 'Erreur : '+e.message;
+    majStatutSync('Erreur : '+e.message);
   }
 }
 
 async function tirerDepuisGitHub(){
   const cfg = chargerConfigSync();
-  if(!cfg.owner || !cfg.repo || !cfg.token){ alert('Configure d\'abord owner, repo et token.'); return; }
-  const statusEl = document.getElementById('syncStatus');
-  statusEl.textContent = 'Récupération en cours...';
+  if(!cfg.owner || !cfg.repo || !cfg.token){ majStatutSync('Configure d\'abord owner, repo et token, puis Enregistrer.'); return; }
+  majStatutSync('Récupération en cours...');
   try{
     const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
     const resp = await fetch(url, {headers:{Authorization:`token ${cfg.token}`}});
-    if(!resp.ok) throw new Error('Échec récupération ('+resp.status+')');
+    if(!resp.ok){
+      const detail = await resp.text().catch(()=> '');
+      throw new Error('Échec récupération ('+resp.status+')'+(detail?' — '+detail.slice(0,120):''));
+    }
     const j = await resp.json();
     const contenu = decodeURIComponent(escape(atob(j.content)));
     etat = JSON.parse(contenu);
     sauver();
-    statusEl.textContent = 'Données récupérées depuis GitHub.';
+    majStatutSync('Données récupérées depuis GitHub.');
     renderBibliotheque(); renderSeances(); renderEnCours();
   }catch(e){
-    statusEl.textContent = 'Erreur : '+e.message;
+    majStatutSync('Erreur : '+e.message);
   }
 }
 
