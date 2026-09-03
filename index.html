@@ -1353,7 +1353,16 @@ async function tirerDepuisGitHub(){
     }
     const j = await resp.json();
     const contenu = decodeURIComponent(escape(atob(j.content)));
-    etat = JSON.parse(contenu);
+    if(!contenu || !contenu.trim()){
+      throw new Error('Le fichier data.json sur GitHub est vide. Envoie d\'abord les données depuis l\'appareil qui les a créées (bouton Envoyer ↑), puis réessaie ici.');
+    }
+    let donneesRecuperees;
+    try{
+      donneesRecuperees = JSON.parse(contenu);
+    }catch(errJson){
+      throw new Error('Le fichier data.json sur GitHub contient des données corrompues et illisibles. Il faudra le réenvoyer depuis un appareil à jour.');
+    }
+    etat = donneesRecuperees;
     sauver();
     majStatutSync('Données récupérées depuis GitHub.');
     renderBibliotheque(); renderSeances(); renderEnCours();
