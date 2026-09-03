@@ -1361,7 +1361,8 @@ async function tirerDepuisGitHub(){
       cache:'no-store',
       headers:{
         Authorization:`token ${cfg.token}`,
-        Accept:'application/vnd.github.raw+json'
+        Accept:'application/vnd.github.v3.raw',
+        'X-GitHub-Api-Version':'2022-11-28'
       }
     });
     if(!resp.ok){
@@ -1379,6 +1380,11 @@ async function tirerDepuisGitHub(){
       throw new Error('Le fichier data.json sur GitHub contient des données corrompues et illisibles. Il faudra le réenvoyer depuis un appareil à jour.');
     }
     const incomplet = !donneesRecuperees || !Array.isArray(donneesRecuperees.exercices);
+    const estEnveloppeGitHub = incomplet && donneesRecuperees && typeof donneesRecuperees==='object'
+      && ('sha' in donneesRecuperees) && ('encoding' in donneesRecuperees);
+    if(estEnveloppeGitHub){
+      throw new Error('GitHub a renvoyé les métadonnées du fichier au lieu de son contenu (le fichier dépasse la limite de lecture standard). Le format demandé n\'a pas été respecté par le serveur — réessaie, et si ça persiste signale-le.');
+    }
     etat = normaliserEtat(migrerSeancesFormat(migrerGroupes(donneesRecuperees)));
     const ok = sauver();
     renderBibliotheque(); renderSeances(); renderEnCours();
