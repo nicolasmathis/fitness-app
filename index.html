@@ -1377,9 +1377,13 @@ async function tirerDepuisGitHub(){
     }
     const incomplet = !donneesRecuperees || !Array.isArray(donneesRecuperees.exercices);
     etat = normaliserEtat(migrerSeancesFormat(migrerGroupes(donneesRecuperees)));
-    sauver();
-    majStatutSync(incomplet ? 'Récupéré, mais le fichier semblait incomplet — vérifie que rien ne manque.' : 'Données récupérées depuis GitHub.');
+    const ok = sauver();
     renderBibliotheque(); renderSeances(); renderEnCours();
+    if(!ok){
+      majStatutSync('Récupéré et affiché, mais impossible de sauvegarder sur cet appareil (stockage plein). Ça disparaîtra si tu quittes l\'appli. Vide de l\'espace ou réduis le nombre de photos.');
+    } else {
+      majStatutSync(incomplet ? 'Récupéré, mais le fichier semblait incomplet — vérifie que rien ne manque.' : 'Données récupérées depuis GitHub.');
+    }
   }catch(e){
     majStatutSync('Erreur : '+e.message);
   }
