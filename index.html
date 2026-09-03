@@ -1333,7 +1333,7 @@ async function pousserVersGitHub(){
   try{
     const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
     let sha = null;
-    const existant = await fetch(url, {headers:{Authorization:`token ${cfg.token}`}});
+    const existant = await fetch(url, {cache:'no-store', headers:{Authorization:`token ${cfg.token}`}});
     if(existant.ok){ const j = await existant.json(); sha = j.sha; }
     const contenu = btoa(unescape(encodeURIComponent(JSON.stringify(etat, null, 2))));
     const resp = await fetch(url, {
@@ -1356,11 +1356,14 @@ async function tirerDepuisGitHub(){
   if(!cfg.owner || !cfg.repo || !cfg.token){ majStatutSync('Configure d\'abord owner, repo et token, puis Enregistrer.'); return; }
   majStatutSync('Récupération en cours...');
   try{
-    const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
-    const resp = await fetch(url, {headers:{
-      Authorization:`token ${cfg.token}`,
-      Accept:'application/vnd.github.raw+json'
-    }});
+    const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}?t=${Date.now()}`;
+    const resp = await fetch(url, {
+      cache:'no-store',
+      headers:{
+        Authorization:`token ${cfg.token}`,
+        Accept:'application/vnd.github.raw+json'
+      }
+    });
     if(!resp.ok){
       const detail = await resp.text().catch(()=> '');
       throw new Error('Échec récupération ('+resp.status+')'+(detail?' — '+detail.slice(0,120):''));
