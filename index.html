@@ -469,17 +469,28 @@ function migrerSeancesFormat(donnees){
   return donnees;
 }
 
-function chargerEtat(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(raw){
-    try{ return migrerSeancesFormat(migrerGroupes(JSON.parse(raw))); }catch(e){}
-  }
-  return {
+function normaliserEtat(donnees){
+  const base = {
     exercices: EXERCICES_BASE.map(e=>({...e,image:null,source:'predefinit'})),
     seances: [],
     historique: [],
     seanceActive: null
   };
+  if(!donnees || typeof donnees !== 'object') return base;
+  return {
+    exercices: Array.isArray(donnees.exercices) ? donnees.exercices : base.exercices,
+    seances: Array.isArray(donnees.seances) ? donnees.seances : base.seances,
+    historique: Array.isArray(donnees.historique) ? donnees.historique : base.historique,
+    seanceActive: (donnees.seanceActive && typeof donnees.seanceActive==='object') ? donnees.seanceActive : null
+  };
+}
+
+function chargerEtat(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){
+    try{ return normaliserEtat(migrerSeancesFormat(migrerGroupes(JSON.parse(raw)))); }catch(e){}
+  }
+  return normaliserEtat(null);
 }
 let etat = chargerEtat();
 let filtreGroupe = 'tous';
@@ -1364,9 +1375,10 @@ async function tirerDepuisGitHub(){
     }catch(errJson){
       throw new Error('Le fichier data.json sur GitHub contient des données corrompues et illisibles. Il faudra le réenvoyer depuis un appareil à jour.');
     }
-    etat = donneesRecuperees;
+    const incomplet = !donneesRecuperees || !Array.isArray(donneesRecuperees.exercices);
+    etat = normaliserEtat(migrerSeancesFormat(migrerGroupes(donneesRecuperees)));
     sauver();
-    majStatutSync('Données récupérées depuis GitHub.');
+    majStatutSync(incomplet ? 'Récupéré, mais le fichier semblait incomplet — vérifie que rien ne manque.' : 'Données récupérées depuis GitHub.');
     renderBibliotheque(); renderSeances(); renderEnCours();
   }catch(e){
     majStatutSync('Erreur : '+e.message);
