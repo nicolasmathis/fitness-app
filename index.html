@@ -1346,13 +1346,15 @@ async function tirerDepuisGitHub(){
   majStatutSync('Récupération en cours...');
   try{
     const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
-    const resp = await fetch(url, {headers:{Authorization:`token ${cfg.token}`}});
+    const resp = await fetch(url, {headers:{
+      Authorization:`token ${cfg.token}`,
+      Accept:'application/vnd.github.raw+json'
+    }});
     if(!resp.ok){
       const detail = await resp.text().catch(()=> '');
       throw new Error('Échec récupération ('+resp.status+')'+(detail?' — '+detail.slice(0,120):''));
     }
-    const j = await resp.json();
-    const contenu = decodeURIComponent(escape(atob(j.content)));
+    const contenu = await resp.text();
     if(!contenu || !contenu.trim()){
       throw new Error('Le fichier data.json sur GitHub est vide. Envoie d\'abord les données depuis l\'appareil qui les a créées (bouton Envoyer ↑), puis réessaie ici.');
     }
