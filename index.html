@@ -744,7 +744,9 @@ function ouvrirModalSeance(editId=null){
     const s = etat.seances.find(x=>x.id===editId);
     if(s){
       seanceConstruction.nom = s.nom;
+      let nbIgnores = 0;
       s.exercices.forEach(ex=>{
+        if(!etat.exercices.some(e=>e.id===ex.exerciceId)){ nbIgnores++; return; }
         let series;
         if(Array.isArray(ex.series) && ex.series.length>0){
           series = ex.series.map(sr=>({poids:(sr.poids!=null?sr.poids:''), repsCible:(sr.repsCible!=null?sr.repsCible:(sr.reps!=null?String(sr.reps):'10'))}));
@@ -754,6 +756,9 @@ function ouvrirModalSeance(editId=null){
         seanceConstruction.selection[ex.exerciceId] = { inclus:true, series, repoSec: (ex.repoSec!=null ? ex.repoSec : '') };
         seanceConstruction.ordre.push(ex.exerciceId);
       });
+      if(nbIgnores>0){
+        alert(`${nbIgnores} exercice(s) de ce programme n'existe(nt) plus dans la Bibliothèque et ${nbIgnores>1?'ont':'a'} été retiré(s) automatiquement. Enregistre le programme pour confirmer.`);
+      }
     }
   }
   document.getElementById('titreEtape1').textContent = editId ? 'Modifier le programme' : 'Nouveau programme';
@@ -942,13 +947,15 @@ let repoTotalSec = 90;
 function demarrerSeance(seanceId){
   const modele = etat.seances.find(s=>s.id===seanceId);
   if(!modele) return;
+  const exercicesValides = modele.exercices.filter(ex=>etat.exercices.some(e=>e.id===ex.exerciceId));
+  const nbIgnores = modele.exercices.length - exercicesValides.length;
   etat.seanceActive = {
     seanceId,
     nom: modele.nom,
     debutTs: Date.now(),
     tempsEcouleSec: 0,
     derniereReprise: null,
-    series: modele.exercices.flatMap(ex=>{
+    series: exercicesValides.flatMap(ex=>{
       const liste = (Array.isArray(ex.series) && ex.series.length>0) ? ex.series : [{poids:null, repsCible:'10'}];
       return liste.map((s,idx)=>{
         const m = String(s.repsCible!=null?s.repsCible:'10').match(/\d+/);
@@ -968,6 +975,9 @@ function demarrerSeance(seanceId){
   sauver();
   changerVue('encours');
   activerWakeLock();
+  if(nbIgnores>0){
+    alert(`Attention : ${nbIgnores} exercice(s) de ce programme n'existe(nt) plus dans la Bibliothèque et ${nbIgnores>1?'ont':'a'} été ignoré(s). Modifie le programme pour les remplacer.`);
+  }
 }
 
 function toggleChronoSeance(){
@@ -1021,6 +1031,9 @@ function renderEnCours(){
     return;
   }
   const s = etat.seanceActive;
+  const nbAvant = s.series.length;
+  s.series = s.series.filter(sr=>etat.exercices.some(e=>e.id===sr.exerciceId));
+  if(s.series.length!==nbAvant) sauver();
   const parExercice = {};
   s.series.forEach(sr=>{
     if(!parExercice[sr.exerciceId]) parExercice[sr.exerciceId]=[];
