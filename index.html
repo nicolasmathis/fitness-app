@@ -291,7 +291,7 @@
 <!-- MODAL EXERCICE -->
 <div class="overlay" id="modalExercice">
   <div class="sheet">
-    <h2>Nouvel exercice</h2>
+    <h2 id="titreModalExercice">Nouvel exercice</h2>
     <label class="field-label">Nom</label>
     <input type="text" id="exNom" placeholder="Ex : Développé incliné">
     <label class="field-label">Groupe musculaire</label>
@@ -307,7 +307,7 @@
       <option value="mollets">Mollets</option>
       <option value="abdos">Abdos</option>
     </select>
-    <label class="field-label">Photo (optionnel)</label>
+    <label class="field-label" id="labelExPhoto">Photo (optionnel)</label>
     <input type="file" id="exPhoto" accept="image/*">
     <div class="sheet-actions">
       <button class="ghost" onclick="fermerModal('modalExercice')">Annuler</button>
@@ -323,6 +323,7 @@
     <label class="field-label">Nom du programme</label>
     <input type="text" id="seNom" placeholder="Ex : Push">
     <label class="field-label">Exercices inclus</label>
+    <input type="text" id="seRecherche" placeholder="Rechercher un exercice..." oninput="setRechercheModalSeance(this.value)" style="margin-bottom:8px;">
     <div class="group-filter" id="seGroupFilter"></div>
     <div id="seExosCheck" style="max-height:280px;overflow-y:auto;margin-bottom:6px;"></div>
     <div class="sheet-actions">
@@ -571,6 +572,7 @@ function renderBibliotheque(){
         📷
         <input type="file" accept="image/*" style="display:none;" onchange="ajouterPhoto('${e.id}', this)">
       </label>
+      <button class="icon-btn" title="Modifier" onclick="ouvrirModalExercice('${e.id}')">✎</button>
       <button class="icon-btn" title="Supprimer" onclick="supprimerExercice('${e.id}')">🗑</button>
     </div>
   `).join('');
@@ -609,8 +611,26 @@ function ajouterPhoto(exId, input){
   });
 }
 
-function ouvrirModalExercice(){
-  document.getElementById('exNom').value='';
+let exerciceEnEdition = null;
+function ouvrirModalExercice(editId=null){
+  exerciceEnEdition = editId;
+  const titre = document.getElementById('titreModalExercice');
+  const btn = document.getElementById('btnCreerExercice');
+  const labelPhoto = document.getElementById('labelExPhoto');
+  if(editId){
+    const ex = etat.exercices.find(e=>e.id===editId);
+    document.getElementById('exNom').value = ex ? ex.nom : '';
+    document.getElementById('exGroupe').value = ex ? ex.groupe : 'pecs';
+    titre.textContent = 'Modifier l\'exercice';
+    btn.textContent = 'Enregistrer';
+    labelPhoto.textContent = ex && ex.image ? 'Remplacer la photo (optionnel)' : 'Photo (optionnel)';
+  } else {
+    document.getElementById('exNom').value='';
+    document.getElementById('exGroupe').value='pecs';
+    titre.textContent = 'Nouvel exercice';
+    btn.textContent = 'Créer';
+    labelPhoto.textContent = 'Photo (optionnel)';
+  }
   document.getElementById('exPhoto').value='';
   ouvrirModal('modalExercice');
 }
@@ -623,15 +643,31 @@ function creerExercice(){
   if(!nom){ alert('Donne un nom à l\'exercice.'); return; }
   creationExerciceEnCours = true;
   const btn = document.getElementById('btnCreerExercice');
-  if(btn){ btn.disabled = true; btn.textContent = 'Création...'; }
-  const nouvel = {id:'ex_'+Date.now(), nom, groupe, image:null, source:'perso'};
-  const finaliser = ()=>{
-    etat.exercices.push(nouvel);
+  const enEdition = exerciceEnEdition;
+  const texteBoutonDefaut = enEdition ? 'Enregistrer' : 'Créer';
+  if(btn){ btn.disabled = true; btn.textContent = enEdition ? 'Enregistrement...' : 'Création...'; }
+
+  const finaliser = (nouvelleImage)=>{
+    let ancienEtat = null;
+    if(enEdition){
+      const ex = etat.exercices.find(e=>e.id===enEdition);
+      if(!ex){ creationExerciceEnCours=false; if(btn){btn.disabled=false; btn.textContent=texteBoutonDefaut;} return; }
+      ancienEtat = {nom: ex.nom, groupe: ex.groupe, image: ex.image};
+      ex.nom = nom; ex.groupe = groupe;
+      if(nouvelleImage) ex.image = nouvelleImage;
+    } else {
+      etat.exercices.push({id:'ex_'+Date.now(), nom, groupe, image: nouvelleImage||null, source:'perso'});
+    }
     const ok = sauver();
     creationExerciceEnCours = false;
-    if(btn){ btn.disabled = false; btn.textContent = 'Créer'; }
+    if(btn){ btn.disabled = false; btn.textContent = texteBoutonDefaut; }
     if(!ok){
-      etat.exercices.pop();
+      if(enEdition && ancienEtat){
+        const ex = etat.exercices.find(e=>e.id===enEdition);
+        if(ex){ ex.nom = ancienEtat.nom; ex.groupe = ancienEtat.groupe; ex.image = ancienEtat.image; }
+      } else {
+        etat.exercices.pop();
+      }
       alert('Impossible d\'enregistrer : la photo est trop volumineuse pour le stockage disponible. Essaie avec une image plus légère.');
       return;
     }
@@ -642,14 +678,13 @@ function creerExercice(){
     traiterPhoto(fichier, (dataUrl)=>{
       if(!dataUrl){
         creationExerciceEnCours = false;
-        if(btn){ btn.disabled = false; btn.textContent = 'Créer'; }
+        if(btn){ btn.disabled = false; btn.textContent = texteBoutonDefaut; }
         alert('Erreur de lecture de la photo. Réessaie ou continue sans photo.');
         return;
       }
-      nouvel.image = dataUrl;
-      finaliser();
+      finaliser(dataUrl);
     });
-  } else finaliser();
+  } else finaliser(null);
 }
 
 /* ---------- Vue Séances (Programmes) ---------- */
@@ -688,9 +723,10 @@ function supprimerSeance(id){
 /* Construction / édition d'un programme en 2 étapes */
 let seanceConstruction = {editId:null, nom:'', selection:{}};
 let filtreGroupeModalSeance = 'tous';
+let rechercheModalSeance = '';
 
 function ouvrirModalSeance(editId=null){
-  seanceConstruction = {editId, nom:'', selection:{}};
+  seanceConstruction = {editId, nom:'', selection:{}, ordre:[]};
   if(editId){
     const s = etat.seances.find(x=>x.id===editId);
     if(s){
@@ -705,18 +741,22 @@ function ouvrirModalSeance(editId=null){
           series = Array.from({length:n}, ()=>({poids:p}));
         }
         seanceConstruction.selection[ex.exerciceId] = { inclus:true, series };
+        seanceConstruction.ordre.push(ex.exerciceId);
       });
     }
   }
   document.getElementById('titreEtape1').textContent = editId ? 'Modifier le programme' : 'Nouveau programme';
   document.getElementById('seNom').value = seanceConstruction.nom;
   filtreGroupeModalSeance = 'tous';
+  rechercheModalSeance = '';
+  document.getElementById('seRecherche').value = '';
   renderSeGroupFilter();
   renderSeExosCheck();
   ouvrirModal('modalSeanceEtape1');
 }
 
 function setFiltreModalSeance(g){ filtreGroupeModalSeance = g; renderSeGroupFilter(); renderSeExosCheck(); }
+function setRechercheModalSeance(v){ rechercheModalSeance = v; renderSeExosCheck(); }
 
 function renderSeGroupFilter(){
   const c = document.getElementById('seGroupFilter');
@@ -728,7 +768,11 @@ function renderSeExosCheck(){
   const c = document.getElementById('seExosCheck');
   let liste = etat.exercices;
   if(filtreGroupeModalSeance!=='tous') liste = liste.filter(e=>e.groupe===filtreGroupeModalSeance);
-  if(liste.length===0){ c.innerHTML = '<p class="muted">Aucun exercice dans ce groupe.</p>'; return; }
+  if(rechercheModalSeance && rechercheModalSeance.trim()){
+    const q = rechercheModalSeance.trim().toLowerCase();
+    liste = liste.filter(e=>e.nom.toLowerCase().includes(q));
+  }
+  if(liste.length===0){ c.innerHTML = '<p class="muted">Aucun exercice ne correspond.</p>'; return; }
   c.innerHTML = liste.map(e=>{
     const coche = !!(seanceConstruction.selection[e.id] && seanceConstruction.selection[e.id].inclus);
     return `
@@ -742,12 +786,18 @@ function renderSeExosCheck(){
 function toggleSelectionExercice(exId, coche){
   if(!seanceConstruction.selection[exId]) seanceConstruction.selection[exId] = {inclus:false, series:[{poids:''}]};
   seanceConstruction.selection[exId].inclus = coche;
+  if(!Array.isArray(seanceConstruction.ordre)) seanceConstruction.ordre = [];
+  if(coche){
+    if(!seanceConstruction.ordre.includes(exId)) seanceConstruction.ordre.push(exId);
+  } else {
+    seanceConstruction.ordre = seanceConstruction.ordre.filter(id=>id!==exId);
+  }
 }
 
 function passerEtapeConfig(){
   const nom = document.getElementById('seNom').value.trim();
   if(!nom){ alert('Donne un nom au programme.'); return; }
-  const inclus = Object.keys(seanceConstruction.selection).filter(id=>seanceConstruction.selection[id].inclus);
+  const inclus = seanceConstruction.ordre.filter(id=>seanceConstruction.selection[id] && seanceConstruction.selection[id].inclus);
   if(inclus.length===0){ alert('Sélectionne au moins un exercice.'); return; }
   seanceConstruction.nom = nom;
   renderSeConfigList();
@@ -764,8 +814,8 @@ function retourEtapeSelection(){
 
 function renderSeConfigList(){
   const c = document.getElementById('seConfigList');
-  const ids = Object.keys(seanceConstruction.selection).filter(id=>seanceConstruction.selection[id].inclus);
-  c.innerHTML = ids.map(exId=>{
+  const ids = seanceConstruction.ordre.filter(id=>seanceConstruction.selection[id] && seanceConstruction.selection[id].inclus);
+  c.innerHTML = ids.map((exId,pos)=>{
     const ex = etat.exercices.find(e=>e.id===exId);
     const sel = seanceConstruction.selection[exId];
     if(!ex) return '';
@@ -778,11 +828,27 @@ function renderSeConfigList(){
     `).join('');
     return `
     <div class="card" style="padding:12px;">
-      <div class="row" style="margin-bottom:8px;"><h3 style="font-size:14px;margin:0;">${ex.nom}</h3><span class="chip">${GROUPES_LABEL[ex.groupe]}</span></div>
+      <div class="row" style="margin-bottom:8px;">
+        <h3 style="font-size:14px;margin:0;">${ex.nom}</h3>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="chip">${GROUPES_LABEL[ex.groupe]}</span>
+          <button class="icon-btn" style="width:30px;height:30px;" title="Monter" ${pos===0?'disabled':''} onclick="deplacerExerciceConfig('${exId}',-1)">↑</button>
+          <button class="icon-btn" style="width:30px;height:30px;" title="Descendre" ${pos===ids.length-1?'disabled':''} onclick="deplacerExerciceConfig('${exId}',1)">↓</button>
+        </div>
+      </div>
       ${lignesSeries}
       <button class="ghost" style="width:100%;font-size:12px;padding:8px;" onclick="ajouterSerieConfig('${exId}')">+ Ajouter une série</button>
     </div>`;
   }).join('');
+}
+
+function deplacerExerciceConfig(exId, direction){
+  const ordre = seanceConstruction.ordre;
+  const i = ordre.indexOf(exId);
+  const j = i + direction;
+  if(i<0 || j<0 || j>=ordre.length) return;
+  [ordre[i], ordre[j]] = [ordre[j], ordre[i]];
+  renderSeConfigList();
 }
 
 function majPoidsSerieConfig(exId, index, valeur){
@@ -807,7 +873,7 @@ function supprimerSerieConfig(exId, index){
 }
 
 function finaliserSeance(){
-  const ids = Object.keys(seanceConstruction.selection).filter(id=>seanceConstruction.selection[id].inclus);
+  const ids = seanceConstruction.ordre.filter(id=>seanceConstruction.selection[id] && seanceConstruction.selection[id].inclus);
   if(ids.length===0){ alert('Sélectionne au moins un exercice.'); return; }
   const exercices = ids.map(exId=>{
     const sel = seanceConstruction.selection[exId];
@@ -945,7 +1011,10 @@ function renderEnCours(){
   Object.keys(parExercice).forEach(exId=>{
     const ex = etat.exercices.find(e=>e.id===exId) || {nom:'Exercice'};
     html += `<div class="ex-block">
-      <div class="ex-block-head"><h4>${ex.nom}</h4></div>
+      <div class="ex-block-head">
+        <div class="ex-thumb" style="width:40px;height:40px;flex-shrink:0;">${ex.image ? `<img src="${ex.image}">` : ''}</div>
+        <h4>${ex.nom}</h4>
+      </div>
       <table class="series">
         <tr><th></th><th>Poids (${uniteLabel()})</th><th>Reps</th><th></th></tr>
         ${parExercice[exId].map(sr=>`
