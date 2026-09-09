@@ -1359,295 +1359,161 @@
       "exercices": [
         {
           "exerciceId": "ex03",
-          "repsCibles": 10,
-          "poidsParSerie": [
-            null,
-            null,
-            null,
-            null
-          ]
+          "series": [
+            {
+              "poids": null,
+              "repsCible": "10"
+            },
+            {
+              "poids": null,
+              "repsCible": "10"
+            },
+            {
+              "poids": null,
+              "repsCible": "10"
+            },
+            {
+              "poids": null,
+              "repsCible": "10"
+            }
+          ],
+          "repoSec": null
         },
         {
           "exerciceId": "ex_1788192387217",
-          "repsCibles": 10,
-          "poidsParSerie": [
-            null
-          ]
-        },
-        {
-          "exerciceId": "ex_1788472827933",
-          "repsCibles": 10,
-          "poidsParSerie": [
-            null
-          ]
+          "series": [
+            {
+              "poids": 30,
+              "repsCible": "6-10"
+            },
+            {
+              "poids": 30,
+              "repsCible": "6-10"
+            },
+            {
+              "poids": 30,
+              "repsCible": "6-10"
+            }
+          ],
+          "repoSec": 120
         },
         {
           "exerciceId": "ex_1788472971928",
-          "repsCibles": 10,
-          "poidsParSerie": [
-            null
-          ]
+          "series": [
+            {
+              "poids": 30,
+              "repsCible": "8-12"
+            },
+            {
+              "poids": 30,
+              "repsCible": "8-12"
+            },
+            {
+              "poids": 30,
+              "repsCible": "8-12"
+            }
+          ],
+          "repoSec": 90
         },
         {
-          "exerciceId": "ex_1788547706133",
-          "repsCibles": 10,
-          "poidsParSerie": [
-            null
-          ]
+          "exerciceId": "ex_1788472827933",
+          "series": [
+            {
+              "poids": 80,
+              "repsCible": "6-10"
+            },
+            {
+              "poids": 80,
+              "repsCible": "6-10"
+            },
+            {
+              "poids": 80,
+              "repsCible": "6-10"
+            }
+          ],
+          "repoSec": 120
         },
         {
           "exerciceId": "ex_1788552596167",
-          "repsCibles": 10,
-          "poidsParSerie": [
-            null
-          ]
+          "series": [
+            {
+              "poids": 30,
+              "repsCible": "8-12"
+            },
+            {
+              "poids": 30,
+              "repsCible": "8-12"
+            }
+          ],
+          "repoSec": 75
+        },
+        {
+          "exerciceId": "ex_1788547465931",
+          "series": [
+            {
+              "poids": 25,
+              "repsCible": "8-12"
+            },
+            {
+              "poids": 25,
+              "repsCible": "8-12"
+            }
+          ],
+          "repoSec": 90
+        },
+        {
+          "exerciceId": "ex_1788986659512",
+          "series": [
+            {
+              "poids": 15,
+              "repsCible": "10-15"
+            },
+            {
+              "poids": 15,
+              "repsCible": "10-15"
+            },
+            {
+              "poids": 15,
+              "repsCible": "10-15"
+            }
+          ],
+          "repoSec": 75
+        },
+        {
+          "exerciceId": "ex_1788986808926",
+          "series": [
+            {
+              "poids": 15,
+              "repsCible": "10-15"
+            },
+            {
+              "poids": 15,
+              "repsCible": "10-15"
+            }
+          ],
+          "repoSec": 60
+        },
+        {
+          "exerciceId": "ex_1788547706133",
+          "series": [
+            {
+              "poids": 15,
+              "repsCible": "12-20"
+            },
+            {
+              "poids": 15,
+              "repsCible": "12-20"
+            },
+            {
+              "poids": 15,
+              "repsCible": "12-20"
+            }
+          ],
+          "repoSec": 60
         }
       ]
     }
   ],
-  "historique": [
-    {
-      "id": "h_1788188992026",
-      "seanceId": "se_1788188937659",
-      "nom": "TEST",
-      "date": "2026-08-31",
-      "debut": "11:09",
-      "fin": "11:09",
-      "series": [
-        {
-          "exerciceId": "ex01",
-          "numero": 1,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex01",
-          "numero": 2,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex01",
-          "numero": 3,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex01",
-          "numero": 4,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex02",
-          "numero": 1,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex02",
-          "numero": 2,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex02",
-          "numero": 3,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex02",
-          "numero": 4,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex03",
-          "numero": 1,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex03",
-          "numero": 2,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex03",
-          "numero": 3,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex03",
-          "numero": 4,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex04",
-          "numero": 1,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex04",
-          "numero": 2,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex04",
-          "numero": 3,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex04",
-          "numero": 4,
-          "poids": "",
-          "reps": 10,
-          "fait": false
-        }
-      ]
-    }
-  ],
-  "seanceActive": {
-    "seanceId": "se_1788188937659",
-    "nom": "TEST",
-    "debutTs": 1788274655808,
-    "tempsEcouleSec": 370.63000000000005,
-    "derniereReprise": null,
-    "series": [
-      {
-        "exerciceId": "ex01",
-        "numero": 1,
-        "poids": "",
-        "reps": 10,
-        "fait": true
-      },
-      {
-        "exerciceId": "ex01",
-        "numero": 2,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex01",
-        "numero": 3,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex01",
-        "numero": 4,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex02",
-        "numero": 1,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex02",
-        "numero": 2,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex02",
-        "numero": 3,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex02",
-        "numero": 4,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex03",
-        "numero": 1,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex03",
-        "numero": 2,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex03",
-        "numero": 3,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex03",
-        "numero": 4,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex04",
-        "numero": 1,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex04",
-        "numero": 2,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex04",
-        "numero": 3,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex04",
-        "numero": 4,
-        "poids": "",
-        "reps": 10,
-        "fait": false
-      }
-    ]
-  }
+  "historique": [],
+  "seanceActive": null
 }
