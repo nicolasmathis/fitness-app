@@ -465,10 +465,16 @@ function migrerSeancesFormat(donnees){
           }
           if(!Array.isArray(ex.series)){
             const repsParDefaut = ex.repsCibles || 10;
-            ex.series = ex.poidsParSerie.map(p=>({poids:p, reps:repsParDefaut}));
+            ex.series = ex.poidsParSerie.map(p=>({poids:p, repsCible:String(repsParDefaut)}));
             delete ex.poidsParSerie;
             delete ex.repsCibles;
           }
+          ex.series.forEach(sr=>{
+            if(sr.repsCible===undefined){
+              sr.repsCible = (sr.reps!=null) ? String(sr.reps) : '10';
+              delete sr.reps;
+            }
+          });
           if(ex.repoSec===undefined) ex.repoSec = null;
         });
       }
@@ -741,14 +747,9 @@ function ouvrirModalSeance(editId=null){
       s.exercices.forEach(ex=>{
         let series;
         if(Array.isArray(ex.series) && ex.series.length>0){
-          series = ex.series.map(sr=>({poids:(sr.poids!=null?sr.poids:''), reps:(sr.reps!=null?sr.reps:10)}));
-        } else if(Array.isArray(ex.poidsParSerie) && ex.poidsParSerie.length>0){
-          const repsDefaut = ex.repsCibles || 10;
-          series = ex.poidsParSerie.map(p=>({poids:(p!=null?p:''), reps:repsDefaut}));
+          series = ex.series.map(sr=>({poids:(sr.poids!=null?sr.poids:''), repsCible:(sr.repsCible!=null?sr.repsCible:(sr.reps!=null?String(sr.reps):'10'))}));
         } else {
-          const n = ex.seriesPrevues || 1;
-          const p = (ex.poidsCible!=null) ? ex.poidsCible : '';
-          series = Array.from({length:n}, ()=>({poids:p, reps:10}));
+          series = [{poids:'', repsCible:'10'}];
         }
         seanceConstruction.selection[ex.exerciceId] = { inclus:true, series, repoSec: (ex.repoSec!=null ? ex.repoSec : '') };
         seanceConstruction.ordre.push(ex.exerciceId);
@@ -794,7 +795,7 @@ function renderSeExosCheck(){
 }
 
 function toggleSelectionExercice(exId, coche){
-  if(!seanceConstruction.selection[exId]) seanceConstruction.selection[exId] = {inclus:false, series:[{poids:'', reps:10}], repoSec:''};
+  if(!seanceConstruction.selection[exId]) seanceConstruction.selection[exId] = {inclus:false, series:[{poids:'', repsCible:'10'}], repoSec:''};
   seanceConstruction.selection[exId].inclus = coche;
   if(!Array.isArray(seanceConstruction.ordre)) seanceConstruction.ordre = [];
   if(coche){
@@ -833,7 +834,7 @@ function renderSeConfigList(){
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
         <span class="muted" style="width:44px;flex-shrink:0;font-size:12px;">Série ${i+1}</span>
         <input type="number" min="0" step="0.5" placeholder="${uniteLabel()}" value="${s.poids}" style="margin:0;" onchange="majPoidsSerieConfig('${exId}',${i},this.value)">
-        <input type="number" min="0" step="1" placeholder="Reps" value="${s.reps!=null?s.reps:''}" style="margin:0;" onchange="majRepsSerieConfig('${exId}',${i},this.value)">
+        <input type="text" placeholder="ex : 6-10" value="${s.repsCible!=null?s.repsCible:''}" style="margin:0;" onchange="majRepsSerieConfig('${exId}',${i},this.value)">
         ${sel.series.length>1 ? `<button class="icon-btn" style="width:34px;height:34px;flex-shrink:0;" onclick="supprimerSerieConfig('${exId}',${i})">✕</button>` : `<span style="width:34px;flex-shrink:0;"></span>`}
       </div>
     `).join('');
@@ -876,7 +877,7 @@ function majPoidsSerieConfig(exId, index, valeur){
 function majRepsSerieConfig(exId, index, valeur){
   const sel = seanceConstruction.selection[exId];
   if(!sel || !sel.series[index]) return;
-  sel.series[index].reps = valeur;
+  sel.series[index].repsCible = valeur;
 }
 
 function majRepoSecConfig(exId, valeur){
@@ -889,7 +890,7 @@ function ajouterSerieConfig(exId){
   const sel = seanceConstruction.selection[exId];
   if(!sel) return;
   const derniere = sel.series[sel.series.length-1];
-  sel.series.push({poids: derniere ? derniere.poids : '', reps: derniere ? derniere.reps : 10});
+  sel.series.push({poids: derniere ? derniere.poids : '', repsCible: derniere ? derniere.repsCible : '10'});
   renderSeConfigList();
 }
 
@@ -905,13 +906,13 @@ function finaliserSeance(){
   if(ids.length===0){ alert('Sélectionne au moins un exercice.'); return; }
   const exercices = ids.map(exId=>{
     const sel = seanceConstruction.selection[exId];
-    const seriesSrc = (sel.series && sel.series.length>0) ? sel.series : [{poids:'', reps:10}];
+    const seriesSrc = (sel.series && sel.series.length>0) ? sel.series : [{poids:'', repsCible:'10'}];
     const series = seriesSrc.map(s=>{
       const p = parseFloat(s.poids);
-      const r = parseInt(s.reps,10);
+      const rc = (s.repsCible!=null && String(s.repsCible).trim()!=='') ? String(s.repsCible).trim() : '10';
       return {
         poids: (!isNaN(p) && p>=0) ? p : null,
-        reps: (!isNaN(r) && r>0) ? r : 10
+        repsCible: rc
       };
     });
     const rp = parseInt(sel.repoSec,10);
@@ -948,15 +949,20 @@ function demarrerSeance(seanceId){
     tempsEcouleSec: 0,
     derniereReprise: null,
     series: modele.exercices.flatMap(ex=>{
-      const liste = (Array.isArray(ex.series) && ex.series.length>0) ? ex.series : [{poids:null, reps:10}];
-      return liste.map((s,idx)=>({
-        exerciceId: ex.exerciceId,
-        numero: idx+1,
-        poids: (s.poids!=null ? s.poids : ''),
-        reps: s.reps || 10,
-        repoSecExercice: (ex.repoSec!=null ? ex.repoSec : null),
-        fait:false
-      }));
+      const liste = (Array.isArray(ex.series) && ex.series.length>0) ? ex.series : [{poids:null, repsCible:'10'}];
+      return liste.map((s,idx)=>{
+        const m = String(s.repsCible!=null?s.repsCible:'10').match(/\d+/);
+        const repsDepart = m ? parseInt(m[0],10) : 10;
+        return {
+          exerciceId: ex.exerciceId,
+          numero: idx+1,
+          poids: (s.poids!=null ? s.poids : ''),
+          reps: repsDepart,
+          repsCible: (s.repsCible!=null ? s.repsCible : '10'),
+          repoSecExercice: (ex.repoSec!=null ? ex.repoSec : null),
+          fait:false
+        };
+      });
     })
   };
   sauver();
@@ -1050,12 +1056,15 @@ function renderEnCours(){
         <h4>${ex.nom}</h4>
       </div>
       <table class="series">
-        <tr><th></th><th>Poids (${uniteLabel()})</th><th>Reps</th><th></th></tr>
+        <tr><th></th><th>Poids (${uniteLabel()})</th><th>Reps <span style="text-transform:none;font-weight:400;">(objectif)</span></th><th></th></tr>
         ${parExercice[exId].map(sr=>`
           <tr class="serie-row ${sr.fait?'done':''}">
             <td class="serie-num">${sr.numero}</td>
             <td><input type="number" inputmode="decimal" value="${sr.poids}" onchange="majSerie('${exId}',${sr.numero},'poids',this.value)"></td>
-            <td><input type="number" inputmode="numeric" value="${sr.reps}" onchange="majSerie('${exId}',${sr.numero},'reps',this.value)"></td>
+            <td>
+              <input type="number" inputmode="numeric" value="${sr.reps}" onchange="majSerie('${exId}',${sr.numero},'reps',this.value)">
+              <div class="muted" style="font-size:10px;text-align:center;margin-top:2px;">${sr.repsCible||''}</div>
+            </td>
             <td><button class="check-btn ${sr.fait?'done':''}" onclick="toggleSerie('${exId}',${sr.numero})">${sr.fait?'✓':''}</button></td>
           </tr>
         `).join('')}
