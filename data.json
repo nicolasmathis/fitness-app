@@ -1494,93 +1494,66 @@
   ],
   "historique": [
     {
-      "id": "h_1788989139241",
+      "id": "h_1788994267487",
       "seanceId": "se_1788188937659",
       "nom": "SÉANCE A - PECTORAUX / DOS / TRICEPS",
       "date": "2026-09-09",
       "debut": "17:25",
-      "fin": "17:25",
+      "fin": "18:51",
       "series": [
         {
           "exerciceId": "ex_1788192387217",
           "numero": 1,
           "poids": 30,
-          "reps": 6,
+          "reps": "10",
           "repsCible": "6-10",
           "repoSecExercice": 120,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788192387217",
           "numero": 2,
-          "poids": 30,
-          "reps": 6,
+          "poids": "40",
+          "reps": "10",
           "repsCible": "6-10",
           "repoSecExercice": 120,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788192387217",
           "numero": 3,
-          "poids": 30,
-          "reps": 6,
+          "poids": "50",
+          "reps": "10",
           "repsCible": "6-10",
           "repoSecExercice": 120,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788472971928",
           "numero": 1,
           "poids": 30,
-          "reps": 8,
+          "reps": "12",
           "repsCible": "8-12",
           "repoSecExercice": 90,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788472971928",
           "numero": 2,
-          "poids": 30,
-          "reps": 8,
+          "poids": "40",
+          "reps": "12",
           "repsCible": "8-12",
           "repoSecExercice": 90,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788472971928",
           "numero": 3,
-          "poids": 30,
-          "reps": 8,
+          "poids": "40",
+          "reps": "10",
           "repsCible": "8-12",
           "repoSecExercice": 90,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex_1788472827933",
-          "numero": 1,
-          "poids": 80,
-          "reps": 6,
-          "repsCible": "6-10",
-          "repoSecExercice": 120,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex_1788472827933",
-          "numero": 2,
-          "poids": 80,
-          "reps": 6,
-          "repsCible": "6-10",
-          "repoSecExercice": 120,
-          "fait": false
-        },
-        {
-          "exerciceId": "ex_1788472827933",
-          "numero": 3,
-          "poids": 80,
-          "reps": 6,
-          "repsCible": "6-10",
-          "repoSecExercice": 120,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788552596167",
@@ -1589,7 +1562,7 @@
           "reps": 8,
           "repsCible": "8-12",
           "repoSecExercice": 75,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788552596167",
@@ -1598,88 +1571,115 @@
           "reps": 8,
           "repsCible": "8-12",
           "repoSecExercice": 75,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788547465931",
           "numero": 1,
-          "poids": 25,
-          "reps": 8,
+          "poids": "20",
+          "reps": "12",
           "repsCible": "8-12",
           "repoSecExercice": 90,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788547465931",
           "numero": 2,
-          "poids": 25,
+          "poids": "30",
           "reps": 8,
           "repsCible": "8-12",
           "repoSecExercice": 90,
-          "fait": false
+          "fait": true
+        },
+        {
+          "exerciceId": "ex_1788472827933",
+          "numero": 1,
+          "poids": 80,
+          "reps": "10",
+          "repsCible": "6-10",
+          "repoSecExercice": 120,
+          "fait": true
+        },
+        {
+          "exerciceId": "ex_1788472827933",
+          "numero": 2,
+          "poids": "90",
+          "reps": "10",
+          "repsCible": "6-10",
+          "repoSecExercice": 120,
+          "fait": true
+        },
+        {
+          "exerciceId": "ex_1788472827933",
+          "numero": 3,
+          "poids": "100",
+          "reps": "10",
+          "repsCible": "6-10",
+          "repoSecExercice": 120,
+          "fait": true
         },
         {
           "exerciceId": "ex_1788986659512",
           "numero": 1,
-          "poids": 15,
-          "reps": 10,
+          "poids": "20",
+          "reps": "15",
           "repsCible": "10-15",
           "repoSecExercice": 75,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788986659512",
           "numero": 2,
-          "poids": 15,
-          "reps": 10,
+          "poids": "25",
+          "reps": "15",
           "repsCible": "10-15",
           "repoSecExercice": 75,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788986659512",
           "numero": 3,
-          "poids": 15,
-          "reps": 10,
+          "poids": "25",
+          "reps": "12",
           "repsCible": "10-15",
           "repoSecExercice": 75,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788986808926",
           "numero": 1,
-          "poids": 15,
-          "reps": 10,
+          "poids": "25",
+          "reps": "15",
           "repsCible": "10-15",
           "repoSecExercice": 60,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788986808926",
           "numero": 2,
-          "poids": 15,
-          "reps": 10,
+          "poids": "30",
+          "reps": "12",
           "repsCible": "10-15",
           "repoSecExercice": 60,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788547706133",
           "numero": 1,
           "poids": 15,
-          "reps": 12,
+          "reps": "20",
           "repsCible": "12-20",
           "repoSecExercice": 60,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788547706133",
           "numero": 2,
-          "poids": 15,
+          "poids": "20",
           "reps": 12,
           "repsCible": "12-20",
           "repoSecExercice": 60,
-          "fait": false
+          "fait": true
         },
         {
           "exerciceId": "ex_1788547706133",
@@ -1688,207 +1688,10 @@
           "reps": 12,
           "repsCible": "12-20",
           "repoSecExercice": 60,
-          "fait": false
+          "fait": true
         }
       ]
     }
   ],
-  "seanceActive": {
-    "seanceId": "se_1788188937659",
-    "nom": "SÉANCE A - PECTORAUX / DOS / TRICEPS",
-    "debutTs": 1788989155689,
-    "tempsEcouleSec": 0,
-    "derniereReprise": null,
-    "series": [
-      {
-        "exerciceId": "ex_1788192387217",
-        "numero": 1,
-        "poids": 30,
-        "reps": 6,
-        "repsCible": "6-10",
-        "repoSecExercice": 120,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788192387217",
-        "numero": 2,
-        "poids": 30,
-        "reps": 6,
-        "repsCible": "6-10",
-        "repoSecExercice": 120,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788192387217",
-        "numero": 3,
-        "poids": 30,
-        "reps": 6,
-        "repsCible": "6-10",
-        "repoSecExercice": 120,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788472971928",
-        "numero": 1,
-        "poids": 30,
-        "reps": 8,
-        "repsCible": "8-12",
-        "repoSecExercice": 90,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788472971928",
-        "numero": 2,
-        "poids": 30,
-        "reps": 8,
-        "repsCible": "8-12",
-        "repoSecExercice": 90,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788472971928",
-        "numero": 3,
-        "poids": 30,
-        "reps": 8,
-        "repsCible": "8-12",
-        "repoSecExercice": 90,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788552596167",
-        "numero": 1,
-        "poids": 30,
-        "reps": 8,
-        "repsCible": "8-12",
-        "repoSecExercice": 75,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788552596167",
-        "numero": 2,
-        "poids": 30,
-        "reps": 8,
-        "repsCible": "8-12",
-        "repoSecExercice": 75,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788547465931",
-        "numero": 1,
-        "poids": 25,
-        "reps": 8,
-        "repsCible": "8-12",
-        "repoSecExercice": 90,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788547465931",
-        "numero": 2,
-        "poids": 25,
-        "reps": 8,
-        "repsCible": "8-12",
-        "repoSecExercice": 90,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788472827933",
-        "numero": 1,
-        "poids": 80,
-        "reps": 6,
-        "repsCible": "6-10",
-        "repoSecExercice": 120,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788472827933",
-        "numero": 2,
-        "poids": 80,
-        "reps": 6,
-        "repsCible": "6-10",
-        "repoSecExercice": 120,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788472827933",
-        "numero": 3,
-        "poids": 80,
-        "reps": 6,
-        "repsCible": "6-10",
-        "repoSecExercice": 120,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788986659512",
-        "numero": 1,
-        "poids": 15,
-        "reps": 10,
-        "repsCible": "10-15",
-        "repoSecExercice": 75,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788986659512",
-        "numero": 2,
-        "poids": 15,
-        "reps": 10,
-        "repsCible": "10-15",
-        "repoSecExercice": 75,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788986659512",
-        "numero": 3,
-        "poids": 15,
-        "reps": 10,
-        "repsCible": "10-15",
-        "repoSecExercice": 75,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788986808926",
-        "numero": 1,
-        "poids": 15,
-        "reps": 10,
-        "repsCible": "10-15",
-        "repoSecExercice": 60,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788986808926",
-        "numero": 2,
-        "poids": 15,
-        "reps": 10,
-        "repsCible": "10-15",
-        "repoSecExercice": 60,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788547706133",
-        "numero": 1,
-        "poids": 15,
-        "reps": 12,
-        "repsCible": "12-20",
-        "repoSecExercice": 60,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788547706133",
-        "numero": 2,
-        "poids": 15,
-        "reps": 12,
-        "repsCible": "12-20",
-        "repoSecExercice": 60,
-        "fait": false
-      },
-      {
-        "exerciceId": "ex_1788547706133",
-        "numero": 3,
-        "poids": 15,
-        "reps": 12,
-        "repsCible": "12-20",
-        "repoSecExercice": 60,
-        "fait": false
-      }
-    ]
-  }
+  "seanceActive": null
 }
