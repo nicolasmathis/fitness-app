@@ -456,13 +456,20 @@ function migrerSeancesFormat(donnees){
     donnees.seances.forEach(s=>{
       if(Array.isArray(s.exercices)){
         s.exercices.forEach(ex=>{
-          if(!Array.isArray(ex.poidsParSerie)){
+          if(!Array.isArray(ex.poidsParSerie) && !Array.isArray(ex.series)){
             const n = ex.seriesPrevues || 1;
             const p = (ex.poidsCible!=null) ? ex.poidsCible : null;
             ex.poidsParSerie = Array.from({length:n}, ()=>p);
             delete ex.seriesPrevues;
             delete ex.poidsCible;
           }
+          if(!Array.isArray(ex.series)){
+            const repsParDefaut = ex.repsCibles || 10;
+            ex.series = ex.poidsParSerie.map(p=>({poids:p, reps:repsParDefaut}));
+            delete ex.poidsParSerie;
+            delete ex.repsCibles;
+          }
+          if(ex.repoSec===undefined) ex.repoSec = null;
         });
       }
     });
@@ -733,14 +740,17 @@ function ouvrirModalSeance(editId=null){
       seanceConstruction.nom = s.nom;
       s.exercices.forEach(ex=>{
         let series;
-        if(Array.isArray(ex.poidsParSerie) && ex.poidsParSerie.length>0){
-          series = ex.poidsParSerie.map(p=>({poids: (p!=null?p:'')}));
+        if(Array.isArray(ex.series) && ex.series.length>0){
+          series = ex.series.map(sr=>({poids:(sr.poids!=null?sr.poids:''), reps:(sr.reps!=null?sr.reps:10)}));
+        } else if(Array.isArray(ex.poidsParSerie) && ex.poidsParSerie.length>0){
+          const repsDefaut = ex.repsCibles || 10;
+          series = ex.poidsParSerie.map(p=>({poids:(p!=null?p:''), reps:repsDefaut}));
         } else {
           const n = ex.seriesPrevues || 1;
           const p = (ex.poidsCible!=null) ? ex.poidsCible : '';
-          series = Array.from({length:n}, ()=>({poids:p}));
+          series = Array.from({length:n}, ()=>({poids:p, reps:10}));
         }
-        seanceConstruction.selection[ex.exerciceId] = { inclus:true, series };
+        seanceConstruction.selection[ex.exerciceId] = { inclus:true, series, repoSec: (ex.repoSec!=null ? ex.repoSec : '') };
         seanceConstruction.ordre.push(ex.exerciceId);
       });
     }
@@ -784,7 +794,7 @@ function renderSeExosCheck(){
 }
 
 function toggleSelectionExercice(exId, coche){
-  if(!seanceConstruction.selection[exId]) seanceConstruction.selection[exId] = {inclus:false, series:[{poids:''}]};
+  if(!seanceConstruction.selection[exId]) seanceConstruction.selection[exId] = {inclus:false, series:[{poids:'', reps:10}], repoSec:''};
   seanceConstruction.selection[exId].inclus = coche;
   if(!Array.isArray(seanceConstruction.ordre)) seanceConstruction.ordre = [];
   if(coche){
@@ -821,8 +831,9 @@ function renderSeConfigList(){
     if(!ex) return '';
     const lignesSeries = sel.series.map((s,i)=>`
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-        <span class="muted" style="width:52px;flex-shrink:0;font-size:12px;">Série ${i+1}</span>
+        <span class="muted" style="width:44px;flex-shrink:0;font-size:12px;">Série ${i+1}</span>
         <input type="number" min="0" step="0.5" placeholder="${uniteLabel()}" value="${s.poids}" style="margin:0;" onchange="majPoidsSerieConfig('${exId}',${i},this.value)">
+        <input type="number" min="0" step="1" placeholder="Reps" value="${s.reps!=null?s.reps:''}" style="margin:0;" onchange="majRepsSerieConfig('${exId}',${i},this.value)">
         ${sel.series.length>1 ? `<button class="icon-btn" style="width:34px;height:34px;flex-shrink:0;" onclick="supprimerSerieConfig('${exId}',${i})">✕</button>` : `<span style="width:34px;flex-shrink:0;"></span>`}
       </div>
     `).join('');
@@ -836,8 +847,13 @@ function renderSeConfigList(){
           <button class="icon-btn" style="width:30px;height:30px;" title="Descendre" ${pos===ids.length-1?'disabled':''} onclick="deplacerExerciceConfig('${exId}',1)">↓</button>
         </div>
       </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;color:var(--text-dim);font-size:11px;padding-left:52px;">
+        <span style="flex:1;">Poids</span><span style="flex:1;">Reps envisagées</span><span style="width:34px;flex-shrink:0;"></span>
+      </div>
       ${lignesSeries}
-      <button class="ghost" style="width:100%;font-size:12px;padding:8px;" onclick="ajouterSerieConfig('${exId}')">+ Ajouter une série</button>
+      <button class="ghost" style="width:100%;font-size:12px;padding:8px;margin-bottom:10px;" onclick="ajouterSerieConfig('${exId}')">+ Ajouter une série</button>
+      <label class="field-label">Repos entre les séries (secondes)</label>
+      <input type="number" min="0" step="5" placeholder="Défaut : ${chargerReglages().repoDefaut}s" value="${sel.repoSec!=null?sel.repoSec:''}" style="margin:0;" onchange="majRepoSecConfig('${exId}',this.value)">
     </div>`;
   }).join('');
 }
@@ -857,11 +873,23 @@ function majPoidsSerieConfig(exId, index, valeur){
   sel.series[index].poids = valeur;
 }
 
+function majRepsSerieConfig(exId, index, valeur){
+  const sel = seanceConstruction.selection[exId];
+  if(!sel || !sel.series[index]) return;
+  sel.series[index].reps = valeur;
+}
+
+function majRepoSecConfig(exId, valeur){
+  const sel = seanceConstruction.selection[exId];
+  if(!sel) return;
+  sel.repoSec = valeur;
+}
+
 function ajouterSerieConfig(exId){
   const sel = seanceConstruction.selection[exId];
   if(!sel) return;
   const derniere = sel.series[sel.series.length-1];
-  sel.series.push({poids: derniere ? derniere.poids : ''});
+  sel.series.push({poids: derniere ? derniere.poids : '', reps: derniere ? derniere.reps : 10});
   renderSeConfigList();
 }
 
@@ -877,15 +905,20 @@ function finaliserSeance(){
   if(ids.length===0){ alert('Sélectionne au moins un exercice.'); return; }
   const exercices = ids.map(exId=>{
     const sel = seanceConstruction.selection[exId];
-    const series = (sel.series && sel.series.length>0) ? sel.series : [{poids:''}];
-    const poidsParSerie = series.map(s=>{
+    const seriesSrc = (sel.series && sel.series.length>0) ? sel.series : [{poids:'', reps:10}];
+    const series = seriesSrc.map(s=>{
       const p = parseFloat(s.poids);
-      return (!isNaN(p) && p>=0) ? p : null;
+      const r = parseInt(s.reps,10);
+      return {
+        poids: (!isNaN(p) && p>=0) ? p : null,
+        reps: (!isNaN(r) && r>0) ? r : 10
+      };
     });
+    const rp = parseInt(sel.repoSec,10);
     return {
       exerciceId: exId,
-      repsCibles: 10,
-      poidsParSerie
+      series,
+      repoSec: (!isNaN(rp) && rp>=0) ? rp : null
     };
   });
   if(seanceConstruction.editId){
@@ -915,12 +948,13 @@ function demarrerSeance(seanceId){
     tempsEcouleSec: 0,
     derniereReprise: null,
     series: modele.exercices.flatMap(ex=>{
-      const liste = (Array.isArray(ex.poidsParSerie) && ex.poidsParSerie.length>0) ? ex.poidsParSerie : [null];
-      return liste.map((poids,idx)=>({
+      const liste = (Array.isArray(ex.series) && ex.series.length>0) ? ex.series : [{poids:null, reps:10}];
+      return liste.map((s,idx)=>({
         exerciceId: ex.exerciceId,
         numero: idx+1,
-        poids: (poids!=null ? poids : ''),
-        reps: ex.repsCibles || 10,
+        poids: (s.poids!=null ? s.poids : ''),
+        reps: s.reps || 10,
+        repoSecExercice: (ex.repoSec!=null ? ex.repoSec : null),
         fait:false
       }));
     })
@@ -1047,7 +1081,8 @@ function toggleSerie(exId, numero){
   renderEnCours();
   if(sr.fait){
     initAudio();
-    demarrerChronoRepos(chargerReglages().repoDefaut);
+    const repos = (sr.repoSecExercice!=null) ? sr.repoSecExercice : chargerReglages().repoDefaut;
+    demarrerChronoRepos(repos);
   }
 }
 
