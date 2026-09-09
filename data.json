@@ -1358,28 +1358,6 @@
       "nom": "SÉANCE A - PECTORAUX / DOS / TRICEPS",
       "exercices": [
         {
-          "exerciceId": "ex03",
-          "series": [
-            {
-              "poids": null,
-              "repsCible": "10"
-            },
-            {
-              "poids": null,
-              "repsCible": "10"
-            },
-            {
-              "poids": null,
-              "repsCible": "10"
-            },
-            {
-              "poids": null,
-              "repsCible": "10"
-            }
-          ],
-          "repoSec": null
-        },
-        {
           "exerciceId": "ex_1788192387217",
           "series": [
             {
@@ -1416,24 +1394,6 @@
           "repoSec": 90
         },
         {
-          "exerciceId": "ex_1788472827933",
-          "series": [
-            {
-              "poids": 80,
-              "repsCible": "6-10"
-            },
-            {
-              "poids": 80,
-              "repsCible": "6-10"
-            },
-            {
-              "poids": 80,
-              "repsCible": "6-10"
-            }
-          ],
-          "repoSec": 120
-        },
-        {
           "exerciceId": "ex_1788552596167",
           "series": [
             {
@@ -1460,6 +1420,24 @@
             }
           ],
           "repoSec": 90
+        },
+        {
+          "exerciceId": "ex_1788472827933",
+          "series": [
+            {
+              "poids": 80,
+              "repsCible": "6-10"
+            },
+            {
+              "poids": 80,
+              "repsCible": "6-10"
+            },
+            {
+              "poids": 80,
+              "repsCible": "6-10"
+            }
+          ],
+          "repoSec": 120
         },
         {
           "exerciceId": "ex_1788986659512",
@@ -1514,6 +1492,403 @@
       ]
     }
   ],
-  "historique": [],
-  "seanceActive": null
+  "historique": [
+    {
+      "id": "h_1788989139241",
+      "seanceId": "se_1788188937659",
+      "nom": "SÉANCE A - PECTORAUX / DOS / TRICEPS",
+      "date": "2026-09-09",
+      "debut": "17:25",
+      "fin": "17:25",
+      "series": [
+        {
+          "exerciceId": "ex_1788192387217",
+          "numero": 1,
+          "poids": 30,
+          "reps": 6,
+          "repsCible": "6-10",
+          "repoSecExercice": 120,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788192387217",
+          "numero": 2,
+          "poids": 30,
+          "reps": 6,
+          "repsCible": "6-10",
+          "repoSecExercice": 120,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788192387217",
+          "numero": 3,
+          "poids": 30,
+          "reps": 6,
+          "repsCible": "6-10",
+          "repoSecExercice": 120,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788472971928",
+          "numero": 1,
+          "poids": 30,
+          "reps": 8,
+          "repsCible": "8-12",
+          "repoSecExercice": 90,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788472971928",
+          "numero": 2,
+          "poids": 30,
+          "reps": 8,
+          "repsCible": "8-12",
+          "repoSecExercice": 90,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788472971928",
+          "numero": 3,
+          "poids": 30,
+          "reps": 8,
+          "repsCible": "8-12",
+          "repoSecExercice": 90,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788472827933",
+          "numero": 1,
+          "poids": 80,
+          "reps": 6,
+          "repsCible": "6-10",
+          "repoSecExercice": 120,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788472827933",
+          "numero": 2,
+          "poids": 80,
+          "reps": 6,
+          "repsCible": "6-10",
+          "repoSecExercice": 120,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788472827933",
+          "numero": 3,
+          "poids": 80,
+          "reps": 6,
+          "repsCible": "6-10",
+          "repoSecExercice": 120,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788552596167",
+          "numero": 1,
+          "poids": 30,
+          "reps": 8,
+          "repsCible": "8-12",
+          "repoSecExercice": 75,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788552596167",
+          "numero": 2,
+          "poids": 30,
+          "reps": 8,
+          "repsCible": "8-12",
+          "repoSecExercice": 75,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788547465931",
+          "numero": 1,
+          "poids": 25,
+          "reps": 8,
+          "repsCible": "8-12",
+          "repoSecExercice": 90,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788547465931",
+          "numero": 2,
+          "poids": 25,
+          "reps": 8,
+          "repsCible": "8-12",
+          "repoSecExercice": 90,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788986659512",
+          "numero": 1,
+          "poids": 15,
+          "reps": 10,
+          "repsCible": "10-15",
+          "repoSecExercice": 75,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788986659512",
+          "numero": 2,
+          "poids": 15,
+          "reps": 10,
+          "repsCible": "10-15",
+          "repoSecExercice": 75,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788986659512",
+          "numero": 3,
+          "poids": 15,
+          "reps": 10,
+          "repsCible": "10-15",
+          "repoSecExercice": 75,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788986808926",
+          "numero": 1,
+          "poids": 15,
+          "reps": 10,
+          "repsCible": "10-15",
+          "repoSecExercice": 60,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788986808926",
+          "numero": 2,
+          "poids": 15,
+          "reps": 10,
+          "repsCible": "10-15",
+          "repoSecExercice": 60,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788547706133",
+          "numero": 1,
+          "poids": 15,
+          "reps": 12,
+          "repsCible": "12-20",
+          "repoSecExercice": 60,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788547706133",
+          "numero": 2,
+          "poids": 15,
+          "reps": 12,
+          "repsCible": "12-20",
+          "repoSecExercice": 60,
+          "fait": false
+        },
+        {
+          "exerciceId": "ex_1788547706133",
+          "numero": 3,
+          "poids": 15,
+          "reps": 12,
+          "repsCible": "12-20",
+          "repoSecExercice": 60,
+          "fait": false
+        }
+      ]
+    }
+  ],
+  "seanceActive": {
+    "seanceId": "se_1788188937659",
+    "nom": "SÉANCE A - PECTORAUX / DOS / TRICEPS",
+    "debutTs": 1788989155689,
+    "tempsEcouleSec": 0,
+    "derniereReprise": null,
+    "series": [
+      {
+        "exerciceId": "ex_1788192387217",
+        "numero": 1,
+        "poids": 30,
+        "reps": 6,
+        "repsCible": "6-10",
+        "repoSecExercice": 120,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788192387217",
+        "numero": 2,
+        "poids": 30,
+        "reps": 6,
+        "repsCible": "6-10",
+        "repoSecExercice": 120,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788192387217",
+        "numero": 3,
+        "poids": 30,
+        "reps": 6,
+        "repsCible": "6-10",
+        "repoSecExercice": 120,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788472971928",
+        "numero": 1,
+        "poids": 30,
+        "reps": 8,
+        "repsCible": "8-12",
+        "repoSecExercice": 90,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788472971928",
+        "numero": 2,
+        "poids": 30,
+        "reps": 8,
+        "repsCible": "8-12",
+        "repoSecExercice": 90,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788472971928",
+        "numero": 3,
+        "poids": 30,
+        "reps": 8,
+        "repsCible": "8-12",
+        "repoSecExercice": 90,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788552596167",
+        "numero": 1,
+        "poids": 30,
+        "reps": 8,
+        "repsCible": "8-12",
+        "repoSecExercice": 75,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788552596167",
+        "numero": 2,
+        "poids": 30,
+        "reps": 8,
+        "repsCible": "8-12",
+        "repoSecExercice": 75,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788547465931",
+        "numero": 1,
+        "poids": 25,
+        "reps": 8,
+        "repsCible": "8-12",
+        "repoSecExercice": 90,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788547465931",
+        "numero": 2,
+        "poids": 25,
+        "reps": 8,
+        "repsCible": "8-12",
+        "repoSecExercice": 90,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788472827933",
+        "numero": 1,
+        "poids": 80,
+        "reps": 6,
+        "repsCible": "6-10",
+        "repoSecExercice": 120,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788472827933",
+        "numero": 2,
+        "poids": 80,
+        "reps": 6,
+        "repsCible": "6-10",
+        "repoSecExercice": 120,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788472827933",
+        "numero": 3,
+        "poids": 80,
+        "reps": 6,
+        "repsCible": "6-10",
+        "repoSecExercice": 120,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788986659512",
+        "numero": 1,
+        "poids": 15,
+        "reps": 10,
+        "repsCible": "10-15",
+        "repoSecExercice": 75,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788986659512",
+        "numero": 2,
+        "poids": 15,
+        "reps": 10,
+        "repsCible": "10-15",
+        "repoSecExercice": 75,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788986659512",
+        "numero": 3,
+        "poids": 15,
+        "reps": 10,
+        "repsCible": "10-15",
+        "repoSecExercice": 75,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788986808926",
+        "numero": 1,
+        "poids": 15,
+        "reps": 10,
+        "repsCible": "10-15",
+        "repoSecExercice": 60,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788986808926",
+        "numero": 2,
+        "poids": 15,
+        "reps": 10,
+        "repsCible": "10-15",
+        "repoSecExercice": 60,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788547706133",
+        "numero": 1,
+        "poids": 15,
+        "reps": 12,
+        "repsCible": "12-20",
+        "repoSecExercice": 60,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788547706133",
+        "numero": 2,
+        "poids": 15,
+        "reps": 12,
+        "repsCible": "12-20",
+        "repoSecExercice": 60,
+        "fait": false
+      },
+      {
+        "exerciceId": "ex_1788547706133",
+        "numero": 3,
+        "poids": 15,
+        "reps": 12,
+        "repsCible": "12-20",
+        "repoSecExercice": 60,
+        "fait": false
+      }
+    ]
+  }
 }
