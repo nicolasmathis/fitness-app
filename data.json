@@ -1403,6 +1403,10 @@
             {
               "poids": 30,
               "repsCible": "8-12"
+            },
+            {
+              "poids": 30,
+              "repsCible": "8-12"
             }
           ],
           "repoSec": 75
@@ -1460,6 +1464,10 @@
         {
           "exerciceId": "ex_1788986808926",
           "series": [
+            {
+              "poids": 15,
+              "repsCible": "10-15"
+            },
             {
               "poids": 15,
               "repsCible": "10-15"
