@@ -2355,6 +2355,156 @@
           "repoSec": 60
         }
       ]
+    },
+    {
+      "id": "se_1789148639737",
+      "nom": "Séance C — FULL BODY + SPÉCIALISATION BRAS",
+      "exercices": [
+        {
+          "exerciceId": "ex_1788472584076",
+          "series": [
+            {
+              "poids": 100,
+              "repsCible": "6-10"
+            },
+            {
+              "poids": 100,
+              "repsCible": "6-10"
+            },
+            {
+              "poids": 100,
+              "repsCible": "6-10"
+            }
+          ],
+          "repoSec": 120
+        },
+        {
+          "exerciceId": "ex_1789141383466",
+          "series": [
+            {
+              "poids": 60,
+              "repsCible": "10-15"
+            },
+            {
+              "poids": 60,
+              "repsCible": "10-15"
+            },
+            {
+              "poids": 60,
+              "repsCible": "10-15"
+            }
+          ],
+          "repoSec": 90
+        },
+        {
+          "exerciceId": "ex_1788192387217",
+          "series": [
+            {
+              "poids": 20,
+              "repsCible": "8-12"
+            },
+            {
+              "poids": 20,
+              "repsCible": "8-12"
+            },
+            {
+              "poids": 20,
+              "repsCible": "8-12"
+            }
+          ],
+          "repoSec": 120
+        },
+        {
+          "exerciceId": "ex_1788472697955",
+          "series": [
+            {
+              "poids": 100,
+              "repsCible": "8-12"
+            },
+            {
+              "poids": 100,
+              "repsCible": "8-12"
+            },
+            {
+              "poids": 100,
+              "repsCible": "8-12"
+            }
+          ],
+          "repoSec": 120
+        },
+        {
+          "exerciceId": "ex_1788547706133",
+          "series": [
+            {
+              "poids": 15,
+              "repsCible": "15-20"
+            },
+            {
+              "poids": 15,
+              "repsCible": "15-20"
+            },
+            {
+              "poids": 15,
+              "repsCible": "15-20"
+            }
+          ],
+          "repoSec": 60
+        },
+        {
+          "exerciceId": "ex_1788551918440",
+          "series": [
+            {
+              "poids": 40,
+              "repsCible": "10-15"
+            },
+            {
+              "poids": 40,
+              "repsCible": "10-15"
+            },
+            {
+              "poids": 40,
+              "repsCible": "10-15"
+            }
+          ],
+          "repoSec": 75
+        },
+        {
+          "exerciceId": "ex_1788986808926",
+          "series": [
+            {
+              "poids": 25,
+              "repsCible": "10-15"
+            },
+            {
+              "poids": 25,
+              "repsCible": "10-15"
+            },
+            {
+              "poids": 25,
+              "repsCible": "10-15"
+            }
+          ],
+          "repoSec": 60
+        },
+        {
+          "exerciceId": "ex_1788986659512",
+          "series": [
+            {
+              "poids": 25,
+              "repsCible": "12-15"
+            },
+            {
+              "poids": 25,
+              "repsCible": "12-15"
+            },
+            {
+              "poids": 25,
+              "repsCible": "12-15"
+            }
+          ],
+          "repoSec": 60
+        }
+      ]
     }
   ],
   "historique": [
