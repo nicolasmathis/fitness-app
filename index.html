@@ -1023,6 +1023,16 @@ function terminerSeance(){
   renderEnCours();
 }
 
+function trouverSerieHistorique(seanceId, exerciceId, numero){
+  if(!seanceId) return null;
+  const seancesPassees = etat.historique.filter(h=>h.seanceId===seanceId).slice().reverse();
+  for(const h of seancesPassees){
+    const sr = h.series.find(x=>x.exerciceId===exerciceId && x.numero===numero && x.fait);
+    if(sr) return {poids: sr.poids, reps: sr.reps, date: h.date};
+  }
+  return null;
+}
+
 function renderEnCours(){
   const c = document.getElementById('encoursContent');
   if(!etat.seanceActive){
@@ -1050,7 +1060,6 @@ function renderEnCours(){
         Durée séance
         <span class="num" id="dureeSeance">00:00</span>
         <button class="ghost" id="btnToggleChrono" style="margin-top:6px;padding:6px 14px;font-size:12px;" onclick="toggleChronoSeance()">${s.derniereReprise ? '⏸ Pause' : '▶ Démarrer'}</button>
-        <div class="muted" id="statutWakeLock" style="font-size:10px;margin-top:6px;">Veille écran : ${wakeLock ? 'actif — écran maintenu allumé' : (wakeLockSouhaite ? 'en attente...' : 'inactif')}</div>
       </div>
       <div class="plate-ring">
         <svg width="88" height="88">
@@ -1075,10 +1084,15 @@ function renderEnCours(){
       </div>
       <table class="series">
         <tr><th></th><th>Poids (${uniteLabel()})</th><th>Reps <span style="text-transform:none;font-weight:400;">(objectif)</span></th><th></th><th></th></tr>
-        ${parExercice[exId].map(sr=>`
+        ${parExercice[exId].map(sr=>{
+          const derniere = trouverSerieHistorique(s.seanceId, exId, sr.numero);
+          return `
           <tr class="serie-row ${sr.fait?'done':''}">
             <td class="serie-num">${sr.numero}</td>
-            <td><input type="number" inputmode="decimal" value="${sr.poids}" onchange="majSerie('${exId}',${sr.numero},'poids',this.value)"></td>
+            <td>
+              <input type="number" inputmode="decimal" value="${sr.poids}" onchange="majSerie('${exId}',${sr.numero},'poids',this.value)">
+              <div class="muted" style="font-size:10px;text-align:center;margin-top:2px;">${derniere ? `Dernière fois : ${derniere.poids!=null?derniere.poids:'?'}×${derniere.reps!=null?derniere.reps:'?'}` : ''}</div>
+            </td>
             <td>
               <input type="number" inputmode="numeric" value="${sr.reps}" onchange="majSerie('${exId}',${sr.numero},'reps',this.value)">
               <div class="muted" style="font-size:10px;text-align:center;margin-top:2px;">${sr.repsCible||''}</div>
@@ -1089,7 +1103,8 @@ function renderEnCours(){
             </td>
           </tr>
           ${sr.commentaire ? `<tr class="serie-row ${sr.fait?'done':''}"><td></td><td colspan="4" class="muted" style="font-size:11px;padding-top:0;padding-bottom:8px;">${sr.commentaire}</td></tr>` : ''}
-        `).join('')}
+          `;
+        }).join('')}
       </table>
     </div>`;
   });
