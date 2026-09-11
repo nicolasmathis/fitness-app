@@ -163,6 +163,8 @@
     display:flex;align-items:center;justify-content:space-between;
     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
     padding:16px 18px;margin-bottom:16px;
+    position:sticky;top:78px;z-index:6;
+    box-shadow:0 6px 12px -6px rgba(0,0,0,0.4);
   }
   .timer-hero .duree{font-size:13px;color:var(--text-dim);}
   .timer-hero .duree .num{font-size:20px;color:var(--text);display:block;}
@@ -196,6 +198,7 @@
     background:var(--surface-2);color:var(--text-dim);font-size:16px;cursor:pointer;
   }
   .check-btn.done{background:var(--sage);border-color:var(--sage);color:#0f1a15;}
+  .icon-btn.done{background:var(--gold);border-color:var(--gold);color:#2a2110;}
   tr.serie-row.done{opacity:0.75;}
 
   .empty-state{text-align:center;padding:40px 20px;color:var(--text-dim);}
@@ -967,6 +970,7 @@ function demarrerSeance(seanceId){
           reps: repsDepart,
           repsCible: (s.repsCible!=null ? s.repsCible : '10'),
           repoSecExercice: (ex.repoSec!=null ? ex.repoSec : null),
+          commentaire: '',
           fait:false
         };
       });
@@ -1046,6 +1050,7 @@ function renderEnCours(){
         Durée séance
         <span class="num" id="dureeSeance">00:00</span>
         <button class="ghost" id="btnToggleChrono" style="margin-top:6px;padding:6px 14px;font-size:12px;" onclick="toggleChronoSeance()">${s.derniereReprise ? '⏸ Pause' : '▶ Démarrer'}</button>
+        <div class="muted" id="statutWakeLock" style="font-size:10px;margin-top:6px;">Veille écran : ${wakeLock ? 'actif — écran maintenu allumé' : (wakeLockSouhaite ? 'en attente...' : 'inactif')}</div>
       </div>
       <div class="plate-ring">
         <svg width="88" height="88">
@@ -1069,7 +1074,7 @@ function renderEnCours(){
         <h4>${ex.nom}</h4>
       </div>
       <table class="series">
-        <tr><th></th><th>Poids (${uniteLabel()})</th><th>Reps <span style="text-transform:none;font-weight:400;">(objectif)</span></th><th></th></tr>
+        <tr><th></th><th>Poids (${uniteLabel()})</th><th>Reps <span style="text-transform:none;font-weight:400;">(objectif)</span></th><th></th><th></th></tr>
         ${parExercice[exId].map(sr=>`
           <tr class="serie-row ${sr.fait?'done':''}">
             <td class="serie-num">${sr.numero}</td>
@@ -1079,7 +1084,11 @@ function renderEnCours(){
               <div class="muted" style="font-size:10px;text-align:center;margin-top:2px;">${sr.repsCible||''}</div>
             </td>
             <td><button class="check-btn ${sr.fait?'done':''}" onclick="toggleSerie('${exId}',${sr.numero})">${sr.fait?'✓':''}</button></td>
+            <td>
+              <button class="icon-btn ${sr.commentaire?'done':''}" title="Commentaire" style="width:34px;height:34px;" onclick="editerCommentaireSerie('${exId}',${sr.numero})">💬</button>
+            </td>
           </tr>
+          ${sr.commentaire ? `<tr class="serie-row ${sr.fait?'done':''}"><td></td><td colspan="4" class="muted" style="font-size:11px;padding-top:0;padding-bottom:8px;">${sr.commentaire}</td></tr>` : ''}
         `).join('')}
       </table>
     </div>`;
@@ -1088,6 +1097,16 @@ function renderEnCours(){
   html += `<button class="primary" style="width:100%;margin-top:10px;" onclick="terminerSeance()">Terminer la séance</button>`;
   c.innerHTML = html;
   demarrerChronoSeance();
+}
+
+function editerCommentaireSerie(exId, numero){
+  const sr = etat.seanceActive.series.find(x=>x.exerciceId===exId && x.numero===numero);
+  if(!sr) return;
+  const valeur = prompt('Commentaire pour cette série (ressenti, douleur, technique...) :', sr.commentaire||'');
+  if(valeur===null) return;
+  sr.commentaire = valeur.trim();
+  sauver();
+  renderEnCours();
 }
 
 function majSerie(exId, numero, champ, valeur){
@@ -1400,20 +1419,37 @@ function supprimerSeanceHistorique(id){
 
 /* ---------- Wake Lock ---------- */
 let wakeLock = null;
+let wakeLockSouhaite = false;
 async function activerWakeLock(){
+  wakeLockSouhaite = true;
   try{
-    if('wakeLock' in navigator){
-      wakeLock = await navigator.wakeLock.request('screen');
+    if(!('wakeLock' in navigator)){
+      majStatutWakeLock('non supporté par ce navigateur');
+      return;
     }
+    wakeLock = await navigator.wakeLock.request('screen');
+    majStatutWakeLock('actif — écran maintenu allumé');
+    wakeLock.addEventListener('release', ()=>{
+      majStatutWakeLock(wakeLockSouhaite ? 'relâché par le système, tentative de reprise...' : 'inactif');
+      if(wakeLockSouhaite && document.visibilityState==='visible'){
+        setTimeout(()=>{ if(wakeLockSouhaite) activerWakeLock(); }, 500);
+      }
+    });
   }catch(err){
-    console.log('Wake Lock indisponible :', err);
+    majStatutWakeLock('échec (' + (err && err.name ? err.name : 'erreur') + ')');
   }
 }
 function relacherWakeLock(){
-  if(wakeLock){ wakeLock.release(); wakeLock=null; }
+  wakeLockSouhaite = false;
+  if(wakeLock){ wakeLock.release().catch(()=>{}); wakeLock=null; }
+  majStatutWakeLock('inactif');
+}
+function majStatutWakeLock(texte){
+  const el = document.getElementById('statutWakeLock');
+  if(el) el.textContent = 'Veille écran : ' + texte;
 }
 document.addEventListener('visibilitychange', ()=>{
-  if(wakeLock!==null && document.visibilityState==='visible' && etat.seanceActive){
+  if(wakeLockSouhaite && document.visibilityState==='visible'){
     activerWakeLock();
   }
 });
